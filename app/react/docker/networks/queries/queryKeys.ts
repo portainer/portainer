@@ -8,8 +8,10 @@ import { NetworksQuery } from './types';
 export const queryKeys = {
   base: (environmentId: EnvironmentId) =>
     [...dockerQueryKeys.root(environmentId), 'networks'] as const,
+  lists: (environmentId: EnvironmentId) =>
+    [...queryKeys.base(environmentId), 'list'] as const,
   list: (environmentId: EnvironmentId, query: NetworksQuery) =>
-    [...queryKeys.base(environmentId), 'list', query] as const,
+    [...queryKeys.lists(environmentId), query] as const,
   item: (environmentId: EnvironmentId, id: NetworkId) =>
     [...queryKeys.base(environmentId), id] as const,
 };

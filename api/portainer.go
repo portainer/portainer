@@ -1578,6 +1578,20 @@ type (
 		Token               string
 	}
 
+	// TokenScope is the API surface a token is allowed to reach.
+	TokenScope string
+
+	// ScopedTokenData is the identity a token carries, together with the
+	// restrictions the token itself places on where that identity may be used.
+	ScopedTokenData struct {
+		*TokenData
+
+		Scope TokenScope
+		// EndpointID is the single environment a kubeconfig-scoped token may reach.
+		// UnscopedToken means unrestricted.
+		EndpointID EndpointID
+	}
+
 	// TunnelDetails represents information associated to a tunnel
 	TunnelDetails struct {
 		Status       string
@@ -1863,8 +1877,10 @@ type (
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, time.Time, error)
-		GenerateTokenForKubeconfig(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, string, time.Time, error)
+		GenerateTokenForKubeconfig(data *TokenData, endpointID EndpointID) (string, error)
+		GenerateTokensForKubeconfig(data *TokenData, endpointIDs []EndpointID) (map[EndpointID]string, error)
+		ParseAndVerifyToken(token string) (*ScopedTokenData, string, time.Time, error)
+		ParseAndVerifySessionToken(token string) (*TokenData, string, time.Time, error)
 		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
@@ -2122,8 +2138,16 @@ type (
 )
 
 const (
+	DefaultTokenScope    TokenScope = "default"
+	KubeconfigTokenScope TokenScope = "kubeconfig"
+)
+
+// UnscopedToken marks a token that is not confined to a single environment.
+const UnscopedToken = 0
+
+const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "2.45.0"
+	APIVersion = "2.45.3"
 	// Support annotation for the API version ("STS" for Short-Term Support or "LTS" for Long-Term Support)
 	APIVersionSupport = "LTS"
 	// Edition is what this edition of Portainer is called
@@ -2173,6 +2197,8 @@ const (
 	DefaultKubeconfigExpiry = "0"
 	// DefaultKubectlShellImage represents the default image and tag for the kubectl shell
 	DefaultKubectlShellImage = "portainer/kubectl-shell:" + APIVersion
+	// DefaultSecretsDir is the directory a relative --secret-key-name is resolved against
+	DefaultSecretsDir = "/run/secrets"
 	// WebSocketKeepAlive web socket keep alive for edge environments
 	WebSocketKeepAlive = 1 * time.Hour
 	// AuthCookieName is the name of the cookie used to store the JWT token

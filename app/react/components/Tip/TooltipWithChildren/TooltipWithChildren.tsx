@@ -21,6 +21,13 @@ export interface Props {
   heading?: string;
   BEFeatureID?: FeatureId;
   appendTo?: TippyProps['appendTo'];
+  /**
+   * Renders the trigger as a button so it can be reached by keyboard. Tippy
+   * only opens on focus of its own reference element, so the tab stop has to
+   * live on the wrapper below rather than on anything the caller passes as
+   * `children`.
+   */
+  focusable?: boolean;
 }
 
 export function TooltipWithChildren({
@@ -31,6 +38,7 @@ export function TooltipWithChildren({
   heading,
   BEFeatureID,
   appendTo,
+  focusable,
 }: Props) {
   const id = _.uniqueId('tooltip-');
 
@@ -78,7 +86,13 @@ export function TooltipWithChildren({
       interactive
       disabled={!message}
     >
-      <span>{children}</span>
+      {focusable ? (
+        <button type="button" className="border-0 bg-transparent p-0">
+          {children}
+        </button>
+      ) : (
+        <span>{children}</span>
+      )}
     </Tippy>
   );
 }

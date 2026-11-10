@@ -1,6 +1,10 @@
 import { RefreshCwIcon } from 'lucide-react';
 
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+
 import { Card } from '@@/primitives/Card';
+
+import { PollingIntervalScopeTip } from '../../components/PollingIntervalScopeTip';
 
 import { DetailField } from './DetailField';
 
@@ -31,6 +35,7 @@ export function PollingWidget({ interval }: Props) {
             </DetailField>
           )}
         </div>
+        {interval && !isBE && <PollingIntervalScopeTip />}
       </Card.Body>
     </Card.Container>
   );

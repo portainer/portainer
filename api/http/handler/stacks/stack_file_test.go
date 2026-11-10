@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
@@ -130,4 +131,68 @@ func TestStackFile_MatchingGitSettings_ReturnsFileContent(t *testing.T) {
 	var resp stackFileResponse
 	require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &resp))
 	require.Equal(t, fileContent, resp.StackFileContent)
+}
+
+func TestStackFile_KubernetesStackNamespaceAccess(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range kubernetesStackAccessCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler := setupKubernetesStackAccess(t, tc.restrictDefaultNamespace)
+
+			rr := serveAsUser(handler, tc.userID, "/stacks/"+strconv.Itoa(int(tc.stackID))+"/file")
+			require.Equal(t, tc.expectedStatus, rr.Code, rr.Body.String())
+
+			if tc.expectedStatus != http.StatusOK {
+				require.NotContains(t, rr.Body.String(), "kind")
+				return
+			}
+
+			var resp stackFileResponse
+			require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &resp))
+			require.Equal(t, kubernetesAccessStacks[tc.stackID].manifest, resp.StackFileContent)
+		})
+	}
+}
+
+func TestStackFile_KubernetesStackPendingGitSettings(t *testing.T) {
+	t.Parallel()
+
+	handler := setupKubernetesStackAccess(t, false)
+
+	const repoURL = "https://github.com/portainer/portainer"
+	const stackID = portainer.StackID(100)
+
+	projectPath := t.TempDir()
+	require.NoError(t, os.WriteFile(filesystem.JoinPaths(projectPath, k8sAccessManifestFile), []byte(k8sAccessUndeclaredManifest), 0o644))
+
+	src := &portainer.Source{Type: portainer.SourceTypeGit, Public: true, Git: &gittypes.GitSource{URL: repoURL}}
+	require.NoError(t, handler.DataStore.Source().Create(source.InsecureNewAdminContext(), src))
+
+	wf := &portainer.Workflow{Artifacts: []portainer.Artifact{{
+		StackID: stackID,
+		Files:   []portainer.ArtifactFile{{SourceID: src.ID, Path: "renamed.yml"}},
+	}}}
+	require.NoError(t, handler.DataStore.Workflow().Create(wf))
+
+	require.NoError(t, handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		return tx.Stack().Create(&portainer.Stack{
+			ID:                    stackID,
+			Name:                  "pending",
+			EndpointID:            k8sAccessEndpointID,
+			Type:                  portainer.KubernetesStack,
+			ProjectPath:           projectPath,
+			EntryPoint:            "renamed.yml",
+			WorkflowID:            wf.ID,
+			CurrentDeploymentInfo: &portainer.StackDeploymentInfo{RepositoryURL: repoURL, ConfigFilePath: k8sAccessManifestFile},
+		})
+	}))
+
+	rr := serveAsUser(handler, k8sAccessStandardUserID, "/stacks/100/file")
+	require.Equal(t, http.StatusConflict, rr.Code, rr.Body.String())
+
+	rr = serveAsUser(handler, k8sAccessStandardUserID, "/stacks/100")
+	require.Equal(t, http.StatusOK, rr.Code, rr.Body.String())
 }

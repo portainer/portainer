@@ -1,5 +1,9 @@
 FROM alpine:latest AS production
 
+# Use the CA bundle from portainer/base instead of Alpine's. It leaves
+# out the eMudhra emSign roots (related to the CVE-2026-111943 incident).
+COPY --from=portainer/base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
 LABEL org.opencontainers.image.title="Portainer" \
     org.opencontainers.image.description="Docker container management made simple, with the world’s most popular GUI-based container management platform." \
     org.opencontainers.image.vendor="Portainer.io" \

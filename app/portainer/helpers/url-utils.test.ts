@@ -1,4 +1,4 @@
-import { isValidReturnUrl } from './url-utils';
+import { isSameDocumentUrl, isValidReturnUrl } from './url-utils';
 
 describe('isValidReturnUrl', () => {
   const origin = 'http://localhost:9000';
@@ -47,5 +47,31 @@ describe('isValidReturnUrl', () => {
     expect(isValidReturnUrl('#!/environments/1/docker/dashboard', origin)).toBe(
       true
     );
+  });
+});
+
+describe('isSameDocumentUrl', () => {
+  const currentUrl = 'http://localhost:9000/#!/auth';
+
+  it('is true when only the hash differs', () => {
+    expect(isSameDocumentUrl('#!/home', currentUrl)).toBe(true);
+    expect(isSameDocumentUrl('http://localhost:9000/#!/home', currentUrl)).toBe(
+      true
+    );
+  });
+
+  it('is true when the hash is unchanged', () => {
+    expect(isSameDocumentUrl('#!/auth', currentUrl)).toBe(true);
+  });
+
+  it('is false when the pathname or search differs', () => {
+    expect(isSameDocumentUrl('/addons/portainer-run', currentUrl)).toBe(false);
+    expect(isSameDocumentUrl('/?foo=bar#!/home', currentUrl)).toBe(false);
+  });
+
+  it('is false for another origin', () => {
+    expect(
+      isSameDocumentUrl('https://evil.example.com/#!/auth', currentUrl)
+    ).toBe(false);
   });
 });

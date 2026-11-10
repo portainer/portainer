@@ -1,12 +1,15 @@
 package crypto
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"errors"
 	"io"
 	"math/rand"
 	"os"
 	"testing"
+	"testing/iotest"
 
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/logs"
@@ -32,8 +35,10 @@ func randBytes(n int) []byte {
 	return b
 }
 
-type encryptFunc func(input io.Reader, output io.Writer, passphrase []byte) error
-type decryptFunc func(input io.Reader, passphrase []byte) (io.Reader, error)
+type (
+	encryptFunc func(input io.Reader, output io.Writer, passphrase []byte) error
+	decryptFunc func(input io.Reader, passphrase []byte) (io.Reader, error)
+)
 
 func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 	const passphrase = "passphrase"
@@ -48,7 +53,7 @@ func Test_encryptAndDecrypt_withTheSamePassword(t *testing.T) {
 		)
 
 		content := randBytes(1024*1024*100 + 523)
-		err := os.WriteFile(originFilePath, content, 0600)
+		err := os.WriteFile(originFilePath, content, 0o600)
 		require.NoError(t, err)
 
 		originFile, _ := os.Open(originFilePath)
@@ -155,7 +160,7 @@ func Test_encryptAndDecrypt_withStrongPassphrase(t *testing.T) {
 
 		content := randBytes(500)
 
-		err := os.WriteFile(originFilePath, content, 0600)
+		err := os.WriteFile(originFilePath, content, 0o600)
 		require.NoError(t, err)
 
 		originFile, err := os.Open(originFilePath)
@@ -212,7 +217,7 @@ func Test_encryptAndDecrypt_withTheSamePasswordSmallFile(t *testing.T) {
 		)
 
 		content := randBytes(500)
-		err := os.WriteFile(originFilePath, content, 0600)
+		err := os.WriteFile(originFilePath, content, 0o600)
 		require.NoError(t, err)
 
 		originFile, err := os.Open(originFilePath)
@@ -270,7 +275,7 @@ func Test_encryptAndDecrypt_withEmptyPassword(t *testing.T) {
 		)
 
 		content := randBytes(1024 * 50)
-		err := os.WriteFile(originFilePath, content, 0600)
+		err := os.WriteFile(originFilePath, content, 0o600)
 		require.NoError(t, err)
 
 		originFile, err := os.Open(originFilePath)
@@ -328,7 +333,7 @@ func Test_decryptWithDifferentPassphrase_shouldProduceWrongResult(t *testing.T) 
 		)
 
 		content := randBytes(1034)
-		err := os.WriteFile(originFilePath, content, 0600)
+		err := os.WriteFile(originFilePath, content, 0o600)
 		require.NoError(t, err)
 
 		originFile, err := os.Open(originFilePath)
@@ -386,6 +391,114 @@ func legacyAesEncrypt(input io.Reader, output io.Writer, passphrase []byte) erro
 	}
 
 	return nil
+}
+
+func Test_aesDecrypt_rejectsInputThatDoesNotMatchTheServerMode(t *testing.T) {
+	t.Parallel()
+	const passphrase = "passphrase"
+
+	encryptedWith := func(encrypt encryptFunc) []byte {
+		t.Helper()
+
+		var buf bytes.Buffer
+		require.NoError(t, encrypt(bytes.NewReader(randBytes(500)), &buf, []byte(passphrase)))
+
+		return buf.Bytes()
+	}
+
+	tests := []struct {
+		name     string
+		input    []byte
+		fipsMode bool
+		wantErr  error
+	}{
+		{
+			// An unencrypted archive carries no known header, so it lands in the
+			// same branch as the legacy format.
+			name:     "unencrypted input in fips mode",
+			input:    randBytes(500),
+			fipsMode: true,
+			wantErr:  ErrNonFIPSApprovedEncryptionInFIPSMode,
+		},
+		{
+			name:     "legacy headerless input in fips mode",
+			input:    encryptedWith(legacyAesEncrypt),
+			fipsMode: true,
+			wantErr:  ErrNonFIPSApprovedEncryptionInFIPSMode,
+		},
+		{
+			// Too short to hold any header, so it cannot have been encrypted in a
+			// fips approved way either.
+			name:     "input shorter than the longest header in fips mode",
+			input:    randBytes(10),
+			fipsMode: true,
+			wantErr:  ErrEncryptedFileTooShort,
+		},
+		{
+			name:     "empty input in fips mode",
+			input:    nil,
+			fipsMode: true,
+			wantErr:  ErrEncryptedFileTooShort,
+		},
+		{
+			name:     "input shorter than the longest header in non fips mode",
+			input:    randBytes(10),
+			fipsMode: false,
+			wantErr:  ErrEncryptedFileTooShort,
+		},
+		{
+			name:     "empty input in non fips mode",
+			input:    nil,
+			fipsMode: false,
+			wantErr:  ErrEncryptedFileTooShort,
+		},
+		{
+			name:     "non fips encrypted input in fips mode",
+			input:    encryptedWith(aesEncryptGCM),
+			fipsMode: true,
+			wantErr:  ErrNonFIPSEncryptedFileInFIPSMode,
+		},
+		{
+			name:     "fips encrypted input in non fips mode",
+			input:    encryptedWith(aesEncryptGCMFIPS),
+			fipsMode: false,
+			wantErr:  ErrFIPSEncryptedFileInNonFIPSMode,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			_, err := aesDecrypt(bytes.NewReader(tt.input), []byte(passphrase), tt.fipsMode)
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
+}
+
+func Test_aesDecrypt_surfacesReadFailures(t *testing.T) {
+	t.Parallel()
+
+	wantErr := errors.New("read failed")
+
+	_, err := aesDecrypt(iotest.ErrReader(wantErr), []byte("passphrase"), true)
+	require.ErrorIs(t, err, wantErr)
+}
+
+func Test_aesDecrypt_acceptsLegacyHeaderlessInputInNonFIPSMode(t *testing.T) {
+	t.Parallel()
+	const passphrase = "passphrase"
+
+	var encrypted bytes.Buffer
+	content := randBytes(500)
+	require.NoError(t, legacyAesEncrypt(bytes.NewReader(content), &encrypted, []byte(passphrase)))
+
+	reader, err := aesDecrypt(bytes.NewReader(encrypted.Bytes()), []byte(passphrase), false)
+	require.NoError(t, err)
+
+	decrypted, err := io.ReadAll(reader)
+	require.NoError(t, err)
+	require.Equal(t, content, decrypted)
 }
 
 func Test_hasEncryptedHeader(t *testing.T) {

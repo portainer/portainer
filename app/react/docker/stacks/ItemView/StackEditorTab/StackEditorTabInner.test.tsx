@@ -47,6 +47,7 @@ const defaultProps = {
   isSubmitting: false,
   isSaved: false,
   webhookId: '',
+  environmentId: 1,
 };
 
 const defaultInitialValues: StackEditorFormValues = {

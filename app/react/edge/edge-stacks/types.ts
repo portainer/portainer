@@ -5,6 +5,7 @@ import {
   RepoConfigResponse,
 } from '@/react/portainer/gitops/types';
 import { RegistryId } from '@/react/portainer/registries/types/registry';
+import { makeGetEnumParam } from '@/react/utils/enum';
 
 import { EnvVar } from '@@/form-components/EnvironmentVariablesFieldset/types';
 
@@ -49,6 +50,8 @@ export enum StatusType {
   /** Completed represents a completed Edge stack */
   Completed,
 }
+
+export const getEdgeStackStatusType = makeGetEnumParam(StatusType);
 
 export interface DeploymentStatus {
   Type: StatusType;

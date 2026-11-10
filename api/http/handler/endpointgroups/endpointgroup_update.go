@@ -1,6 +1,7 @@
 package endpointgroups
 
 import (
+	"errors"
 	"net/http"
 	"reflect"
 
@@ -14,6 +15,11 @@ import (
 	"github.com/portainer/portainer/pkg/libhttp/response"
 
 	"github.com/rs/zerolog/log"
+)
+
+const (
+	unassignedGroupID   = portainer.EndpointGroupID(1)
+	unassignedGroupName = "Unassigned"
 )
 
 type endpointGroupUpdatePayload struct {
@@ -46,6 +52,7 @@ func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
 // @param body body endpointGroupUpdatePayload true "EndpointGroup details"
 // @success 200 {object} portainer.EndpointGroup "Success"
 // @failure 400 "Invalid request"
+// @failure 403 "Renaming the default 'Unassigned' group is not allowed"
 // @failure 404 "EndpointGroup not found"
 // @failure 500 "Server error"
 // @router /endpoint_groups/{id} [put]
@@ -79,6 +86,10 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 	}
 
 	if payload.Name != "" {
+		if !isRenameAllowed(endpointGroup, payload.Name) {
+			return nil, httperror.Forbidden("Unable to rename the default 'Unassigned' group", errors.New("the default environment group can only be renamed to 'Unassigned'"))
+		}
+
 		endpointGroup.Name = payload.Name
 	}
 
@@ -221,4 +232,8 @@ func (handler *Handler) updateEndpointGroup(tx dataservices.DataStoreTx, endpoin
 	}
 
 	return endpointGroup, nil
+}
+
+func isRenameAllowed(group *portainer.EndpointGroup, name string) bool {
+	return group.ID != unassignedGroupID || name == unassignedGroupName
 }

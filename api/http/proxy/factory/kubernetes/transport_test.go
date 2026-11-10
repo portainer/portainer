@@ -8,9 +8,11 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/jwt"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,7 +33,7 @@ func (m *MockJWTService) GenerateToken(data *portainer.TokenData) (string, time.
 	return "mock-token", time.Now().Add(24 * time.Hour), nil
 }
 
-func (m *MockJWTService) GenerateTokenForKubeconfig(data *portainer.TokenData) (string, error) {
+func (m *MockJWTService) GenerateTokenForKubeconfig(data *portainer.TokenData, endpointID portainer.EndpointID) (string, error) {
 	if m.generateTokenFunc != nil {
 		return m.generateTokenFunc(data)
 	}
@@ -39,8 +41,34 @@ func (m *MockJWTService) GenerateTokenForKubeconfig(data *portainer.TokenData) (
 	return "mock-kubeconfig-token", nil
 }
 
-func (m *MockJWTService) ParseAndVerifyToken(token string) (*portainer.TokenData, string, time.Time, error) {
-	return &portainer.TokenData{ID: 1, Username: "mock", Role: portainer.AdministratorRole}, "mock-id", time.Now().Add(24 * time.Hour), nil
+func (m *MockJWTService) GenerateTokensForKubeconfig(data *portainer.TokenData, endpointIDs []portainer.EndpointID) (map[portainer.EndpointID]string, error) {
+	tokens := make(map[portainer.EndpointID]string, len(endpointIDs))
+	for _, endpointID := range endpointIDs {
+		token, err := m.GenerateTokenForKubeconfig(data, endpointID)
+		if err != nil {
+			return nil, err
+		}
+
+		tokens[endpointID] = token
+	}
+
+	return tokens, nil
+}
+
+func (m *MockJWTService) ParseAndVerifyToken(token string) (*portainer.ScopedTokenData, string, time.Time, error) {
+	return &portainer.ScopedTokenData{
+		TokenData: &portainer.TokenData{ID: 1, Username: "mock", Role: portainer.AdministratorRole},
+		Scope:     portainer.DefaultTokenScope,
+	}, "mock-id", time.Now().Add(24 * time.Hour), nil
+}
+
+func (m *MockJWTService) ParseAndVerifySessionToken(token string) (*portainer.TokenData, string, time.Time, error) {
+	tokenData, jti, expiresAt, err := m.ParseAndVerifyToken(token)
+	if err != nil {
+		return nil, "", time.Time{}, err
+	}
+
+	return tokenData.TokenData, jti, expiresAt, nil
 }
 
 func (m *MockJWTService) SetUserSessionDuration(userSessionDuration time.Duration) {
@@ -76,6 +104,7 @@ func TestBaseTransport_AddTokenForExec(t *testing.T) {
 	// Create base transport
 	transport := &baseTransport{
 		jwtService: jwtService,
+		endpoint:   &portainer.Endpoint{ID: 1},
 	}
 
 	tests := []struct {
@@ -243,6 +272,7 @@ func TestBaseTransport_AddTokenForExec(t *testing.T) {
 			if tt.name == "JWT service failure" {
 				testTransport = &baseTransport{
 					jwtService: nil,
+					endpoint:   &portainer.Endpoint{ID: 1},
 				}
 			} else {
 				testTransport = transport
@@ -298,6 +328,7 @@ func TestBaseTransport_AddTokenForExec_Integration(t *testing.T) {
 	transport := &baseTransport{
 		httpTransport: &http.Transport{},
 		jwtService:    mockJWTService,
+		endpoint:      &portainer.Endpoint{ID: 1},
 	}
 
 	tests := []struct {
@@ -362,6 +393,78 @@ func TestBaseTransport_AddTokenForExec_Integration(t *testing.T) {
 			assert.NotEmpty(t, capturedAuthHeader)
 			assert.True(t, strings.HasPrefix(capturedAuthHeader, "Bearer "))
 			assert.Equal(t, "Bearer "+tt.expectedToken, capturedAuthHeader)
+		})
+	}
+}
+
+type serviceAccountRecordingKubeClient struct {
+	portainer.KubeClient
+	setupUserIDs []int
+}
+
+func (kcl *serviceAccountRecordingKubeClient) SetupUserServiceAccount(userID int, teamIDs []int, restrictDefaultNamespace bool) error {
+	kcl.setupUserIDs = append(kcl.setupUserIDs, userID)
+
+	return nil
+}
+
+// Writes to portainer-config only refresh the cached clients and user service accounts once
+// Kubernetes accepted them, so a denied write cannot force a refresh
+func TestProxyPortainerConfigUpdate(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		upstreamStatus  int
+		expectRefreshed bool
+	}{
+		{name: "accepted", upstreamStatus: http.StatusOK, expectRefreshed: true},
+		{name: "forbidden", upstreamStatus: http.StatusForbidden, expectRefreshed: false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			_, store := datastore.MustNewTestStore(t, true, false)
+
+			endpoint := &portainer.Endpoint{
+				ID:                 1,
+				UserAccessPolicies: portainer.UserAccessPolicies{2: {}},
+			}
+			require.NoError(t, store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+				return tx.Endpoint().Create(endpoint)
+			}))
+
+			factory, err := cli.NewClientFactory(nil, nil, nil, "test", "", "")
+			require.NoError(t, err)
+			factory.SetProxyKubeClient("1", "2", &cli.KubeClient{})
+
+			upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(tt.upstreamStatus)
+			}))
+			defer upstream.Close()
+
+			request, err := http.NewRequest(http.MethodPut, upstream.URL+"/api/v1/namespaces/portainer/configmaps/portainer-config", nil)
+			require.NoError(t, err)
+			request.RequestURI = "/api/endpoints/1/kubernetes/api/v1/namespaces/portainer/configmaps/portainer-config"
+
+			kcl := &serviceAccountRecordingKubeClient{}
+			transport := &baseTransport{
+				httpTransport:    &http.Transport{},
+				tokenManager:     &tokenManager{kubecli: kcl, dataStore: store},
+				endpoint:         endpoint,
+				k8sClientFactory: factory,
+				dataStore:        store,
+			}
+
+			resp, err := transport.proxyKubernetesRequest(request)
+			require.NoError(t, err)
+			require.Equal(t, tt.upstreamStatus, resp.StatusCode)
+			require.NoError(t, resp.Body.Close())
+
+			_, cached := factory.GetProxyKubeClient("1", "2")
+			assert.Equal(t, !tt.expectRefreshed, cached, "client cache should only be cleared after an accepted write")
+			assert.Equal(t, tt.expectRefreshed, len(kcl.setupUserIDs) > 0, "service accounts should only be rebuilt after an accepted write")
 		})
 	}
 }

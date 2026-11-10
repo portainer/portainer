@@ -293,3 +293,25 @@ func TestDeployKubernetesStackInline(t *testing.T) {
 		require.Equal(t, portainer.SourceStatusHealthy, updatedSrc.Status)
 	})
 }
+
+func TestDeployKubernetesStackInlineMarksRefStatusHealthy(t *testing.T) {
+	t.Parallel()
+
+	handler, stack, gitConfig, sourceID, securityContext := setupDeployKubernetesStackInlineTest(t, nil, portainer.StackStatusActive)
+	req := mockDeployKubernetesStackInlineRequest()
+
+	stackutils.PrepareStackStatusForDeployment(stack)
+	deploymentConfig, httpErr := handler.deployStack(req, stack, false, &portainer.Endpoint{})
+	require.Nil(t, httpErr)
+
+	httpErr = handler.deployKubernetesStackInline(deploymentConfig, stack, securityContext, gitConfig, sourceID, nil)
+	require.Nil(t, httpErr)
+
+	// A redeploy resets the artifact statuses to unknown, so the ref status must be set again
+	wf, err := handler.DataStore.Workflow().Read(stack.WorkflowID)
+	require.NoError(t, err)
+
+	file := wf.Artifacts[0].Files[0]
+	require.Equal(t, portainer.SourceStatusHealthy, file.RefStatus)
+	require.Equal(t, portainer.SourceStatusHealthy, file.PathStatus)
+}

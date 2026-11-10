@@ -47,6 +47,10 @@ func (handler *Handler) teamMembershipDelete(w http.ResponseWriter, r *http.Requ
 		return httperror.Forbidden("Permission denied to delete the membership", errors.ErrResourceAccessDenied)
 	}
 
+	if !securityContext.IsAdmin && membership.UserID == securityContext.UserID {
+		return httperror.Forbidden("Permission denied to remove your own team membership", errors.ErrResourceAccessDenied)
+	}
+
 	err = handler.DataStore.TeamMembership().Delete(portainer.TeamMembershipID(membershipID))
 	if err != nil {
 		return httperror.InternalServerError("Unable to remove the team membership from the database", err)

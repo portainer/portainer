@@ -102,7 +102,9 @@ func (handler *Handler) stackStop(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.Conflict("Stack deployment is in progress", errors.New("stack deployment is in progress"))
 	}
 
-	stopErr := handler.stopStack(r.Context(), securityContext.UserID, stack, endpoint)
+	// Detached from the request context so a client disconnect doesn't cut short
+	// an in-flight undeploy, matching stackStart's use of context.TODO().
+	stopErr := handler.stopStack(context.TODO(), securityContext.UserID, stack, endpoint)
 	if stopErr != nil {
 		if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
 			stackutils.UpdateStackStatusFromUndeploymentResult(stack, stopErr)

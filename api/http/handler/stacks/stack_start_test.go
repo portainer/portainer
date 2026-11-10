@@ -10,10 +10,15 @@ import (
 	"github.com/pkg/errors"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/datastore"
+	dockerclient "github.com/portainer/portainer/api/docker/client"
+	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/stacks/deployments"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
 )
 
 // Stubs
@@ -25,10 +30,17 @@ func (s *stubComposeStackManager) NormalizeStackName(name string) string { retur
 
 type stubStackDeployer struct {
 	deployments.StackDeployer
-	deployErr error
+	deployErr       error
+	composeDeployed bool
+}
+
+func (s *stubStackDeployer) GetDockerClientFactory() *dockerclient.ClientFactory {
+	return nil
 }
 
 func (s *stubStackDeployer) DeployComposeStack(_ context.Context, _ *portainer.Stack, _ *portainer.Endpoint, _ []portainer.Registry, _, _, _ bool) error {
+	s.composeDeployed = true
+
 	return s.deployErr
 }
 
@@ -137,4 +149,54 @@ func TestStackStart_StartFailure_StackStatusSetToError(t *testing.T) {
 	lastEntry := updated.DeploymentStatus[0]
 	assert.Equal(t, portainer.StackStatusError, lastEntry.Status)
 	assert.Equal(t, deployErr.Error(), lastEntry.Message)
+}
+
+func TestStackStart_NonAdminRestrictedCompose_IsRejectedWithoutErrorStatus(t *testing.T) {
+	t.Parallel()
+	h, store := newStackStartHandler(t)
+
+	fileService, err := filesystem.NewService(t.TempDir(), "")
+	require.NoError(t, err)
+
+	h.FileService = fileService
+
+	user := &portainer.User{ID: 2, Username: "user", Role: portainer.StandardUserRole}
+	err = store.User().Create(user)
+	require.NoError(t, err)
+
+	endpoint := &portainer.Endpoint{ID: 1, Name: "testEndpoint", SecuritySettings: portainer.EndpointSecuritySettings{AllowStackManagementForRegularUsers: true}}
+	err = store.Endpoint().Create(endpoint)
+	require.NoError(t, err)
+
+	projectPath := t.TempDir()
+	err = os.WriteFile(filesystem.JoinPaths(projectPath, "docker-compose.yml"), []byte("services:\n  web:\n    image: alpine\n    volumes:\n      - /:/host\n"), 0o600)
+	require.NoError(t, err)
+
+	stack := newStartableStack(endpoint.ID)
+	stack.ProjectPath = projectPath
+	stack.EntryPoint = "docker-compose.yml"
+	stack.Status = portainer.StackStatusInactive
+	err = store.Stack().Create(stack)
+	require.NoError(t, err)
+
+	err = store.ResourceControl().Create(&portainer.ResourceControl{ResourceID: stackutils.ResourceControlID(endpoint.ID, stack.Name), Type: portainer.StackResourceControl, Public: true})
+	require.NoError(t, err)
+
+	deployer := &stubStackDeployer{}
+	h.ComposeStackManager = &stubComposeStackManager{}
+	h.StackDeployer = deployer
+
+	req := httptest.NewRequest(http.MethodPost, "/stacks/"+strconv.Itoa(int(stack.ID))+"/start?endpointId="+strconv.Itoa(int(endpoint.ID)), nil)
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{UserID: user.ID, User: user}))
+
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusForbidden, w.Code)
+	require.False(t, deployer.composeDeployed, "a restricted compose file must not reach the deployer")
+
+	updated, err := store.Stack().Read(stack.ID)
+	require.NoError(t, err)
+	require.Equal(t, portainer.StackStatusInactive, updated.Status, "a preflight rejection must not flag the stack as errored")
+	require.Empty(t, updated.DeploymentStatus)
 }

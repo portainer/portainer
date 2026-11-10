@@ -24,6 +24,11 @@ const (
 	DatabaseFileName          = "portainer.db"
 	EncryptedDatabaseFileName = "portainer.edb"
 
+	// EncryptionSaltFileName is the file in the data directory holding the salt used
+	// to derive the database encryption key. It only exists in fips mode, where
+	// database encryption is mandatory.
+	EncryptionSaltFileName = "db_encryption_salt"
+
 	txMaxSize       = 65536
 	compactedSuffix = ".compacted"
 )
@@ -163,7 +168,7 @@ func (connection *DbConnection) Open() error {
 	log.Info().Str("filename", connection.GetDatabaseFileName()).Msg("loading PortainerDB")
 
 	databasePath := connection.GetDatabaseFilePath()
-	db, err := bolt.Open(databasePath, 0600, connection.boltOptions(connection.Compact))
+	db, err := bolt.Open(databasePath, 0o600, connection.boltOptions(connection.Compact))
 	if err != nil {
 		return err
 	}
@@ -260,7 +265,7 @@ func (connection *DbConnection) ExportRaw(filename string) error {
 		return err
 	}
 
-	return os.WriteFile(filename, b, 0600)
+	return os.WriteFile(filename, b, 0o600)
 }
 
 // ConvertToKey returns an 8-byte big endian representation of v.

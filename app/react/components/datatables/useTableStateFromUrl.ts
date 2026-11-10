@@ -162,10 +162,6 @@ export function parsePositiveIntOrNull(raw: unknown): number | null {
   return n !== null && n > 0 ? n : null;
 }
 
-export function asEnum<T>(value: unknown, allowed: Set<T>): T | null {
-  return allowed.has(value as T) ? (value as T) : null;
-}
-
 function parseOrder(raw: string | undefined): 'asc' | 'desc' | null {
   return raw === 'asc' || raw === 'desc' ? raw : null;
 }

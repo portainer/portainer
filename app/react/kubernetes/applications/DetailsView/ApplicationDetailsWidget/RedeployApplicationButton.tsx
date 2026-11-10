@@ -62,10 +62,8 @@ export function RedeployApplicationButton({
       return;
     }
     try {
-      if (!app?.spec?.selector?.matchLabels) {
-        throw new Error(
-          `Application has no 'matchLabels' selector to redeploy pods.`
-        );
+      if (!app?.spec?.selector) {
+        throw new Error(`Application has no selector to redeploy pods.`);
       }
     } catch (error) {
       notifyError('Failure', error as Error);
@@ -85,9 +83,7 @@ export function RedeployApplicationButton({
     }
 
     // using the matchlabels object, delete the associated pods with redeployAppMutation
-    const labelSelector = matchLabelsToLabelSelectorValue(
-      app?.spec?.selector?.matchLabels
-    );
+    const labelSelector = matchLabelsToLabelSelectorValue(app?.spec?.selector);
     redeployAppMutation.mutateAsync(
       { labelSelector },
       {

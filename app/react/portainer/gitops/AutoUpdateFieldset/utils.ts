@@ -34,12 +34,12 @@ export function getDefaultAutoUpdateValues(): AutoUpdateModel {
 export function parseAutoUpdateResponse(
   response?: AutoUpdateResponse | null
 ): AutoUpdateModel {
-  if (!response || (!response?.Interval && !response?.Webhook)) {
+  if (!response || !response?.Webhook) {
     return getDefaultAutoUpdateValues();
   }
 
   return {
-    RepositoryAutomaticUpdates: true,
+    RepositoryAutomaticUpdates: !!response?.Webhook,
     RepositoryAutomaticUpdatesForce: response.ForceUpdate,
     ForcePullImage: response.ForcePullImage,
   };

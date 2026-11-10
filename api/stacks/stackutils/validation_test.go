@@ -67,9 +67,10 @@ networks:
 `)
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := IsValidStackFile(StackFileValidationConfig{
+	err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 		Content:          yamlContent,
 		SecuritySettings: securitySettings,
+		NetworkAccess:    unrestrictedNetworks,
 	})
 	require.NoError(t, err)
 }
@@ -82,7 +83,7 @@ func TestIsValidStackFile_MissingEnvVarBehavior(t *testing.T) {
 	securitySettings := &portainer.EndpointSecuritySettings{}
 
 	t.Run("var on left side only passes (docker allows :9090)", func(t *testing.T) {
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content: []byte(`
 version: "3"
 services:
@@ -92,12 +93,13 @@ services:
       - "${API_PORT}:9090"
 `),
 			SecuritySettings: securitySettings,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 		require.NoError(t, err)
 	})
 
 	t.Run("var on right side fails", func(t *testing.T) {
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content: []byte(`
 version: "3"
 services:
@@ -107,12 +109,13 @@ services:
       - "9090:${API_PORT}"
 `),
 			SecuritySettings: securitySettings,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 		require.Error(t, err)
 	})
 
 	t.Run("var on both sides fails", func(t *testing.T) {
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content: []byte(`
 version: "3"
 services:
@@ -122,6 +125,7 @@ services:
       - "${API_PORT}:${API_PORT}"
 `),
 			SecuritySettings: securitySettings,
+			NetworkAccess:    unrestrictedNetworks,
 		})
 		require.Error(t, err)
 	})
@@ -130,7 +134,7 @@ services:
 func TestIsValidStackFile_EnvVarInBothPortFields(t *testing.T) {
 	t.Parallel()
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := IsValidStackFile(StackFileValidationConfig{
+	err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 		Content: []byte(`
 version: "3"
 
@@ -141,6 +145,7 @@ services:
       - "${API_PORT}:${API_PORT}"
 `),
 		SecuritySettings: securitySettings,
+		NetworkAccess:    unrestrictedNetworks,
 		Env:              map[string]string{"API_PORT": "3000"},
 	})
 	require.NoError(t, err)
@@ -184,7 +189,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -215,7 +220,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -246,7 +251,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.ErrorContains(t, err, "failed to build stack environment variables")
 }
 
@@ -273,7 +278,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -304,7 +309,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err = ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err = ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -335,7 +340,7 @@ services:
 	}
 
 	securitySettings := &portainer.EndpointSecuritySettings{}
-	err = ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err = ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.NoError(t, err)
 }
 
@@ -364,8 +369,109 @@ services:
 	securitySettings := &portainer.EndpointSecuritySettings{
 		AllowBindMountsForRegularUsers: false,
 	}
-	err := ValidateStackFiles(stack, securitySettings, fileService, nil)
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
 	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
+}
+
+func TestValidateStackFiles_VolumesFromBlockedForNonAdmin(t *testing.T) {
+	t.Parallel()
+
+	fileContent := []byte(`
+services:
+  pwn:
+    image: alpine
+    volumes_from:
+      - "container:portainer"
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	// Denied when bind mounts are disabled for regular users
+	err := ValidateStackFiles(t.Context(), stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false}, fileService, nil, unrestrictedNetworks)
+	require.ErrorContains(t, err, "bind-mount disabled for non administrator users")
+
+	// Allowed when bind mounts are enabled
+	err = ValidateStackFiles(t.Context(), stack, &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: true}, fileService, nil, unrestrictedNetworks)
+	require.NoError(t, err)
+}
+
+func TestValidateStackFiles_ConfigFileHostEscapeBlockedForNonAdmin(t *testing.T) {
+	t.Parallel()
+	fileContent := []byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    configs:
+      - leak
+
+configs:
+  leak:
+    file: /etc/shadow
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: "/tmp/stack/1",
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: "/tmp/stack/1",
+	}
+
+	securitySettings := &portainer.EndpointSecuritySettings{
+		AllowBindMountsForRegularUsers: false,
+	}
+	err := ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
+	require.ErrorContains(t, err, "reading a file from the host is disabled for non administrator users")
+}
+
+func TestValidateStackFiles_ConfigFileInsideProjectAllowedForNonAdmin(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+
+	err := os.WriteFile(filesystem.JoinPaths(tmpDir, "nginx.conf"), []byte("server {}"), 0o600)
+	require.NoError(t, err)
+
+	fileContent := []byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    configs:
+      - site
+
+configs:
+  site:
+    file: ./nginx.conf
+`)
+
+	stack := &portainer.Stack{
+		ProjectPath: tmpDir,
+		EntryPoint:  "docker-compose.yml",
+	}
+
+	fileService := mockFileService{
+		fileContent:        fileContent,
+		projectVersionPath: tmpDir,
+	}
+
+	securitySettings := &portainer.EndpointSecuritySettings{
+		AllowBindMountsForRegularUsers: false,
+	}
+	err = ValidateStackFiles(t.Context(), stack, securitySettings, fileService, nil, unrestrictedNetworks)
+	require.NoError(t, err)
 }
 
 func TestIsValidStackFile_VolumeBindMountRestrictions(t *testing.T) {
@@ -377,9 +483,10 @@ func TestIsValidStackFile_VolumeBindMountRestrictions(t *testing.T) {
 		t.Helper()
 
 		securitySettings := &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false}
-		err := IsValidStackFile(StackFileValidationConfig{
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
 			Content:          yamlContent,
 			SecuritySettings: securitySettings,
+			NetworkAccess:    unrestrictedNetworks,
 			StackName:        stackName,
 			DockerClient:     dockerClient,
 		})
@@ -443,6 +550,19 @@ services:
         target: /container/path
 `), "", nil, forbidden)
 
+	// service-level volume "type: npipe" (Windows named pipe) is bind-equivalent
+	f([]byte(`
+version: "3"
+
+services:
+  api:
+    image: nginx
+    volumes:
+      - type: npipe
+        source: \\.\pipe\docker_engine
+        target: \\.\pipe\docker_engine
+`), "", nil, forbidden)
+
 	// an external volume that is actually bind-backed is rejected
 	f([]byte(`
 version: "3"
@@ -480,7 +600,7 @@ volumes:
 		Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"},
 	}), forbidden)
 
-	// with no Docker client, the existing-volume check is skipped and the stack is valid
+	// with no Docker client, the existing-volume check fails closed rather than being skipped
 	f([]byte(`
 version: "3"
 
@@ -492,7 +612,7 @@ services:
 
 volumes:
   data: {}
-`), "mystack", nil, "")
+`), "mystack", nil, "unable to verify bind-mount status without a Docker client")
 
 	// an explicit "name:" override resolves to the overridden Docker-side name
 	f([]byte(`
@@ -512,6 +632,857 @@ volumes:
 		Driver:  "local",
 		Options: map[string]string{"type": "none", "o": "bind", "device": "/etc"},
 	}), forbidden)
+}
+
+func TestIsValidStackFile_ConfigAndSecretFileRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const workingDir = "/data/compose/17"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       workingDir,
+			ProjectPath:      workingDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a config reading an absolute host path is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - leak
+
+configs:
+  leak:
+    file: /etc/shadow
+`), false, forbidden)
+
+	// a config climbing out of the stack directory is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - leak
+
+configs:
+  leak:
+    file: ../../../../etc/shadow
+`), false, forbidden)
+
+	// the same trick through a secret is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    secrets:
+      - leak
+
+secrets:
+  leak:
+    file: /root/.ssh/id_rsa
+`), false, forbidden)
+
+	// a config file shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - site
+
+configs:
+  site:
+    file: ./nginx.conf
+`), false, "")
+
+	// inline content is not a host path
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - site
+
+configs:
+  site:
+    content: |
+      server { listen 80; }
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - leak
+
+configs:
+  leak:
+    file: /etc/shadow
+`), true, "")
+}
+
+func TestIsValidStackFile_EnvFileRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	root := t.TempDir()
+	projectDir := filesystem.JoinPaths(root, "project")
+	outsideDir := filesystem.JoinPaths(root, "outside")
+
+	err := os.MkdirAll(projectDir, 0700)
+	require.NoError(t, err)
+
+	err = os.MkdirAll(outsideDir, 0700)
+	require.NoError(t, err)
+
+	err = os.WriteFile(filesystem.JoinPaths(projectDir, "web.env"), []byte("HOST_PORT=3000\n"), 0600)
+	require.NoError(t, err)
+
+	outsideFile := filesystem.JoinPaths(outsideDir, "secret.env")
+	err = os.WriteFile(outsideFile, []byte("HOST_PORT=3000\n"), 0600)
+	require.NoError(t, err)
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       projectDir,
+			ProjectPath:      projectDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// an env_file reading an absolute host path outside the project is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    env_file:
+      - `+outsideFile+`
+`), false, forbidden)
+
+	// an env_file pointing outside the project is rejected even when the target
+	// doesn't exist, proving the check runs before compose-go's own env_file
+	// resolution ever touches the filesystem
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    env_file:
+      - /this/path/does/not/exist/at/all.env
+`), false, forbidden)
+
+	// an env_file climbing out of the stack directory is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    env_file:
+      - ../outside/secret.env
+`), false, forbidden)
+
+	// an env_file shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    env_file:
+      - ./web.env
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    env_file:
+      - `+outsideFile+`
+`), true, "")
+}
+
+func TestIsValidStackFile_LabelFileRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	root := t.TempDir()
+	projectDir := filesystem.JoinPaths(root, "project")
+	outsideDir := filesystem.JoinPaths(root, "outside")
+
+	err := os.MkdirAll(projectDir, 0700)
+	require.NoError(t, err)
+
+	err = os.MkdirAll(outsideDir, 0700)
+	require.NoError(t, err)
+
+	err = os.WriteFile(filesystem.JoinPaths(projectDir, "labels.env"), []byte("owner=team-a\n"), 0600)
+	require.NoError(t, err)
+
+	outsideFile := filesystem.JoinPaths(outsideDir, "secret.env")
+	err = os.WriteFile(outsideFile, []byte("owner=team-a\n"), 0600)
+	require.NoError(t, err)
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       projectDir,
+			ProjectPath:      projectDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a label_file reading an absolute host path outside the project is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    label_file:
+      - `+outsideFile+`
+`), false, forbidden)
+
+	// a label_file pointing outside the project is rejected even when the target
+	// doesn't exist, proving the check runs before compose-go's own label_file
+	// resolution ever touches the filesystem
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    label_file:
+      - /this/path/does/not/exist/at/all.env
+`), false, forbidden)
+
+	// a label_file climbing out of the stack directory is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    label_file:
+      - ../outside/secret.env
+`), false, forbidden)
+
+	// a label_file shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    label_file:
+      - ./labels.env
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    label_file:
+      - `+outsideFile+`
+`), true, "")
+}
+
+func TestIsValidStackFile_BuildContextRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const workingDir = "/data/compose/17"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       workingDir,
+			ProjectPath:      workingDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a build context reading an absolute host path is rejected
+	f([]byte(`
+services:
+  api:
+    build:
+      context: /etc
+      dockerfile_inline: |
+        FROM alpine
+        COPY . /leak
+`), false, forbidden)
+
+	// a build context climbing out of the stack directory is rejected
+	f([]byte(`
+services:
+  api:
+    build:
+      context: ../../../../etc
+      dockerfile_inline: |
+        FROM alpine
+        COPY . /leak
+`), false, forbidden)
+
+	// an additional build context outside the stack directory is rejected too
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      additional_contexts:
+        leak: /etc
+`), false, forbidden)
+
+	// a build context shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    build:
+      context: ./backend
+`), false, "")
+
+	// a remote build context is left alone, it is not a local host path
+	f([]byte(`
+services:
+  api:
+    build:
+      context: https://github.com/portainer/portainer.git
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    build:
+      context: /etc
+      dockerfile_inline: |
+        FROM alpine
+        COPY . /leak
+`), true, "")
+}
+
+func TestIsValidStackFile_DockerfileRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const workingDir = "/data/compose/17"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       workingDir,
+			ProjectPath:      workingDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// an absolute dockerfile path outside the project is rejected, even though
+	// the build context itself is safely inside the project
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      dockerfile: /etc/passwd
+`), false, forbidden)
+
+	// a dockerfile climbing out of the build context is rejected
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ../../../../etc/passwd
+`), false, forbidden)
+
+	// a dockerfile inside the build context keeps working
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+`), false, "")
+
+	// dockerfile_inline needs no path check, it carries its content in the compose file itself
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM alpine
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      dockerfile: /etc/passwd
+`), true, "")
+}
+
+func TestIsValidStackFile_BuildSSHRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const workingDir = "/data/compose/17"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       workingDir,
+			ProjectPath:      workingDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a build ssh key reading an absolute host path is rejected
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      ssh:
+        - myid=/etc/shadow
+`), false, forbidden)
+
+	// a build ssh key climbing out of the stack directory is rejected
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      ssh:
+        - myid=../../../../etc/shadow
+`), false, forbidden)
+
+	// a build ssh key shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      ssh:
+        - myid=./id_rsa
+`), false, "")
+
+	// the "default" ssh agent socket has no path and is left alone
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      ssh:
+        - default
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    build:
+      context: .
+      ssh:
+        - myid=/etc/shadow
+`), true, "")
+}
+
+func TestIsValidStackFile_DevelopWatchRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const workingDir = "/data/compose/17"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       workingDir,
+			ProjectPath:      workingDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a develop.watch path reading an absolute host path is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    develop:
+      watch:
+        - path: /etc
+          action: sync
+          target: /app
+`), false, forbidden)
+
+	// a develop.watch path climbing out of the stack directory is rejected
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    develop:
+      watch:
+        - path: ../../../../etc
+          action: sync
+          target: /app
+`), false, forbidden)
+
+	// a develop.watch path shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    develop:
+      watch:
+        - path: ./src
+          action: sync
+          target: /app
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    image: nginx
+    develop:
+      watch:
+        - path: /etc
+          action: sync
+          target: /app
+`), true, "")
+}
+
+// TestIsValidStackFile_IncludeDisabledForNonAdmin documents why `include` is
+// disabled outright for non-admins instead of being validated field by field
+// like the other file-reading attributes: compose-go's `include` processing
+// resolves `include.env_file` by reading files directly from disk, bypassing
+// the ResourceLoaders mechanism entirely, so a per-field containment check
+// can be bypassed. Disabling the whole feature avoids relying on having
+// found every such bypass.
+func TestIsValidStackFile_IncludeDisabledForNonAdmin(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+	projectDir := filesystem.JoinPaths(root, "project")
+
+	err := os.MkdirAll(projectDir, 0700)
+	require.NoError(t, err)
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       projectDir,
+			ProjectPath:      projectDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// for a non-admin, an include pointing at a file that doesn't even exist
+	// is silently ignored rather than erroring, proving it is never touched
+	// on disk at all
+	f([]byte(`
+include:
+  - /this/path/does/not/exist/at/all.yml
+
+services:
+  api:
+    image: nginx
+`), false, "")
+
+	// the include.env_file bypass is closed the same way: it is never reached
+	// because include processing does not run at all for non-admins
+	f([]byte(`
+include:
+  - path: /this/path/does/not/exist/either.yml
+    env_file: /etc/shadow
+
+services:
+  api:
+    image: nginx
+`), false, "")
+
+	// administrators are unaffected: include is still fully processed, so a
+	// nonexistent path surfaces the underlying "file not found" error
+	f([]byte(`
+include:
+  - /this/path/does/not/exist/at/all.yml
+
+services:
+  api:
+    image: nginx
+`), true, "no such file or directory")
+}
+
+func TestIsValidStackFile_ExtendsFileRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	root := t.TempDir()
+	projectDir := filesystem.JoinPaths(root, "project")
+	outsideDir := filesystem.JoinPaths(root, "outside")
+
+	err := os.MkdirAll(projectDir, 0700)
+	require.NoError(t, err)
+
+	err = os.MkdirAll(outsideDir, 0700)
+	require.NoError(t, err)
+
+	baseContent := []byte("services:\n  base:\n    image: nginx\n")
+
+	err = os.WriteFile(filesystem.JoinPaths(projectDir, "base.yml"), baseContent, 0600)
+	require.NoError(t, err)
+
+	outsideFile := filesystem.JoinPaths(outsideDir, "base.yml")
+	err = os.WriteFile(outsideFile, baseContent, 0600)
+	require.NoError(t, err)
+
+	f := func(yamlContent []byte, allowBindMounts bool, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          yamlContent,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: allowBindMounts},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       projectDir,
+			ProjectPath:      projectDir,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// extends reading an absolute host path outside the project is rejected
+	f([]byte(`
+services:
+  api:
+    extends:
+      file: `+outsideFile+`
+      service: base
+`), false, forbidden)
+
+	// extends climbing out of the stack directory is contained inside the
+	// project directory instead of escaping it, so it fails as a missing file
+	// rather than as an explicit rejection
+	err = IsValidStackFile(t.Context(), StackFileValidationConfig{
+		Content: []byte(`
+services:
+  api:
+    extends:
+      file: ../outside/base.yml
+      service: base
+`),
+		SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false},
+		NetworkAccess:    unrestrictedNetworks,
+		WorkingDir:       projectDir,
+		ProjectPath:      projectDir,
+	})
+	require.Error(t, err)
+
+	// extends targeting a file shipped with the stack keeps working
+	f([]byte(`
+services:
+  api:
+    extends:
+      file: ./base.yml
+      service: base
+`), false, "")
+
+	// extends targeting a service within the same file keeps working
+	f([]byte(`
+services:
+  base:
+    image: nginx
+  api:
+    extends:
+      service: base
+`), false, "")
+
+	// administrators are still allowed to read host paths
+	f([]byte(`
+services:
+  api:
+    extends:
+      file: `+outsideFile+`
+      service: base
+`), true, "")
+}
+
+func TestIsValidStackFile_ConfigFileOutsideEntrypointDirButInsideProject(t *testing.T) {
+	t.Parallel()
+
+	const projectPath = "/data/compose/42"
+	const workingDir = projectPath + "/envs/prod"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(fileRef, wantErrSubstring string) {
+		t.Helper()
+
+		content := []byte(`
+services:
+  api:
+    image: nginx
+    configs:
+      - c
+
+configs:
+  c:
+    file: ` + fileRef + `
+`)
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          content,
+			SecuritySettings: &portainer.EndpointSecuritySettings{AllowBindMountsForRegularUsers: false},
+			NetworkAccess:    unrestrictedNetworks,
+			WorkingDir:       workingDir,
+			ProjectPath:      projectPath,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// entry point lives in envs/prod; a sibling directory under the project root is allowed
+	f("../shared/secret.txt", "")
+
+	// climbing past the project root is still rejected
+	f("../../../../etc/shadow", forbidden)
+}
+
+// TestCheckFileObjectSource_RelativeFileFailsClosed guards the assumption that
+// compose-go always resolves a config/secret file: value to absolute before
+// IsValidStackFile sees it. filepath.Rel errors when comparing an absolute
+// projectPath against a relative file, and that error is treated as a rejection,
+// so an unresolved relative path fails closed instead of being silently accepted.
+func TestCheckFileObjectSource_RelativeFileFailsClosed(t *testing.T) {
+	t.Parallel()
+
+	const projectPath = "/data/compose/17"
+	const forbidden = "reading a file from the host is disabled for non administrator users"
+
+	f := func(file, wantErrSubstring string) {
+		t.Helper()
+
+		err := checkFileObjectSource("config", "c", file, projectPath)
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// a relative file, unresolved against projectPath, can't be proven safe
+	f("nginx.conf", forbidden)
+
+	// a relative escape attempt is rejected the same way
+	f("../../etc/shadow", forbidden)
+
+	// an absolute file that resolves inside projectPath is still allowed
+	f(projectPath+"/nginx.conf", "")
 }
 
 func TestExtractImageRegistry(t *testing.T) {
@@ -718,4 +1689,232 @@ services:
 
 	err := ValidateComposeURLs(t.Context(), stack, fileService)
 	require.NoError(t, err)
+}
+
+func TestIsValidStackFile_NetworkRestrictions(t *testing.T) {
+	t.Parallel()
+
+	const (
+		forbidden = "forbidden to join this network"
+		noClient  = "unable to verify network access"
+	)
+
+	dockerClient, access := newNetworkTestFixtures(t)
+
+	f := func(yamlContent string, dockerClient *client.Client, access *NetworkAccess, wantErrSubstring string) {
+		t.Helper()
+
+		err := IsValidStackFile(t.Context(), StackFileValidationConfig{
+			Content:          []byte(yamlContent),
+			SecuritySettings: &portainer.EndpointSecuritySettings{},
+			StackName:        "mystack",
+			DockerClient:     dockerClient,
+			NetworkAccess:    access,
+		})
+
+		if wantErrSubstring == "" {
+			require.NoError(t, err)
+
+			return
+		}
+
+		require.ErrorContains(t, err, wantErrSubstring)
+	}
+
+	// joining another user's network as an external network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: othernet
+`, dockerClient, access, forbidden)
+
+	// an external network keyed by the network's own name is checked too
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [othernet]
+networks:
+  othernet:
+    external: true
+`, dockerClient, access, forbidden)
+
+	// joining an external network the user owns is allowed
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: ownnet
+`, dockerClient, access, "")
+
+	// an external network that does not exist cannot be verified
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: missingnet
+`, dockerClient, access, "missingnet")
+
+	// a network_mode naming another user's network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    network_mode: othernet
+`, dockerClient, access, forbidden)
+
+	// network modes that are not networks need no authorization
+	f(`
+services:
+  db:
+    image: alpine
+    network_mode: none
+  web:
+    image: alpine
+    network_mode: service:db
+  sidecar:
+    image: alpine
+    network_mode: container:abc123
+  local:
+    image: alpine
+    network_mode: bridge
+`, nil, nil, "")
+
+	// building on another user's network is forbidden
+	f(`
+services:
+  web:
+    build:
+      context: .
+      network: othernet
+`, dockerClient, access, forbidden)
+
+	// building on a network the user owns is allowed
+	f(`
+services:
+  web:
+    build:
+      context: .
+      network: ownnet
+`, dockerClient, access, "")
+
+	// building on a built-in network needs no authorization
+	f(`
+services:
+  web:
+    build:
+      context: .
+      network: host
+`, dockerClient, access, "")
+
+	// renaming a stack network to another user's existing network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    name: othernet
+`, dockerClient, access, forbidden)
+
+	// renaming a stack network to another user's stack network is forbidden
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [backend]
+networks:
+  backend:
+    name: otherstack_backend
+`, dockerClient, access, forbidden)
+
+	// renaming a stack network to a name that does not exist yet is allowed, the stack creates it
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    name: brandnew
+`, dockerClient, access, "")
+
+	// a stack network keeping its default name cannot adopt another user's network with that name
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [taken]
+networks:
+  taken: {}
+`, dockerClient, access, forbidden)
+
+	// a stack network created by a previous deploy of the same stack is allowed
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [own]
+networks:
+  own: {}
+`, dockerClient, access, "")
+
+	// a stack network keeping its default name that does not exist yet is allowed, the stack creates it
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [backend]
+networks:
+  backend: {}
+`, dockerClient, access, "")
+
+	// the implicit default network cannot be verified without a Docker client
+	f(`
+services:
+  web:
+    image: alpine
+`, nil, access, noClient)
+
+	// external networks cannot be verified without a Docker client
+	f(`
+services:
+  web:
+    image: alpine
+    networks: [x]
+networks:
+  x:
+    external: true
+    name: ownnet
+`, nil, access, noClient)
+
+	// external networks cannot be verified without network access information
+	f(`
+services:
+  web:
+    image: alpine
+    network_mode: ownnet
+`, dockerClient, nil, noClient)
+
+	// unrestricted access skips the check, so no Docker client is needed
+	f(`
+services:
+  web:
+    image: alpine
+    network_mode: othernet
+`, nil, &NetworkAccess{Unrestricted: true}, "")
 }

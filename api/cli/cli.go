@@ -2,6 +2,7 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,7 +26,9 @@ var (
 	ErrAdminPassExcludeAdminPassFile = errors.New("Cannot use --admin-password with --admin-password-file")
 )
 
-func CLIFlags() *portainer.CLIFlags {
+// CLIFlags declares the flags shared by both editions. secretsDir is the directory a relative
+// --secret-key-name is resolved against, which differs between CE and EE.
+func CLIFlags(secretsDir string) *portainer.CLIFlags {
 	return &portainer.CLIFlags{
 		Addr:                      kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
 		AddrHTTPS:                 kingpin.Flag("bind-https", "Address and port to serve Portainer via https").Default(defaultHTTPSBindAddress).String(),
@@ -51,7 +54,7 @@ func CLIFlags() *portainer.CLIFlags {
 		InitialMmapSize:           kingpin.Flag("initial-mmap-size", "Initial mmap size of the database in bytes").Int(),
 		MaxBatchSize:              kingpin.Flag("max-batch-size", "Maximum size of a batch").Default(defaultMaxBatchSize).Int(),
 		MaxBatchDelay:             kingpin.Flag("max-batch-delay", "Maximum delay before a batch starts").Default(defaultMaxBatchDelay).Duration(),
-		SecretKeyName:             kingpin.Flag("secret-key-name", "Secret key name for encryption and will be used as /run/secrets/<secret-key-name>.").Default(defaultSecretKeyName).String(),
+		SecretKeyName:             kingpin.Flag("secret-key-name", fmt.Sprintf("Secret key name for encryption and will be used as %s/<secret-key-name>. An absolute path is used as-is.", secretsDir)).Default(defaultSecretKeyName).String(),
 		LogLevel:                  kingpin.Flag("log-level", "Set the minimum logging level to show").Default("INFO").Enum("DEBUG", "INFO", "WARN", "ERROR"),
 		LogMode:                   kingpin.Flag("log-mode", "Set the logging output mode").Default("PRETTY").Enum("NOCOLOR", "PRETTY", "JSON"),
 		PullLimitCheckDisabled:    kingpin.Flag("pull-limit-check-disabled", "Pull limit check").Envar(portainer.PullLimitCheckDisabledEnvVar).Default(defaultPullLimitCheckDisabled).Bool(),
@@ -86,7 +89,7 @@ func (Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	).IsSetByUser(&hasSSLKeyFlag)
 	sslKey := sslKeyFlag.String()
 
-	flags := CLIFlags()
+	flags := CLIFlags(portainer.DefaultSecretsDir)
 
 	var hasTLSFlag, hasTLSCertFlag, hasTLSKeyFlag bool
 	tlsFlag := kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).IsSetByUser(&hasTLSFlag)

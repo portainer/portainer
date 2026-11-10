@@ -1,8 +1,6 @@
 package sdk
 
 import (
-	"time"
-
 	"github.com/pkg/errors"
 	"github.com/portainer/portainer/pkg/libhelm/cache"
 	"github.com/portainer/portainer/pkg/libhelm/options"
@@ -61,7 +59,7 @@ func (hspm *HelmSDKPackageManager) Upgrade(upgradeOpts options.InstallOptions) (
 
 	// Initialize action configuration with kubernetes config
 	actionConfig := new(action.Configuration)
-	err = hspm.initActionConfig(actionConfig, namespaceOrDefault(upgradeOpts.Namespace), upgradeOpts.KubernetesClusterAccess)
+	err = hspm.initActionConfig(actionConfig, namespaceOrDefault(upgradeOpts.Namespace), upgradeOpts.KubernetesClusterAccess, nil)
 	if err != nil {
 		// error is already logged in initActionConfig
 		return nil, errors.Wrap(err, "failed to initialize helm configuration for helm release upgrade")
@@ -197,15 +195,7 @@ func initUpgradeClient(actionConfig *action.Configuration, upgradeOpts options.I
 	}
 
 	// Set default values if not specified
-	if upgradeOpts.Timeout == 0 {
-		if upgradeClient.RollbackOnFailure {
-			upgradeClient.Timeout = 30 * time.Minute // the atomic flag significantly increases the upgrade time
-		} else {
-			upgradeClient.Timeout = 15 * time.Minute
-		}
-	} else {
-		upgradeClient.Timeout = upgradeOpts.Timeout
-	}
+	upgradeClient.Timeout = releaseTimeout(upgradeOpts.Timeout, upgradeClient.RollbackOnFailure)
 	if upgradeOpts.Namespace == "" {
 		upgradeClient.Namespace = "default"
 	} else {

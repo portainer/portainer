@@ -239,3 +239,83 @@ export function isSystemLabel(labelKey: string): boolean {
     labelKey === KubernetesPortainerNodeDrainLabel
   );
 }
+
+/**
+ * Kubernetes has no standard label for the node pool a node belongs to, so each
+ * distribution sets its own. Listed most to least specific, so that a node
+ * provisioned by Karpenter inside an EKS cluster reports its Karpenter pool.
+ *
+ * A node outside any pool reports nothing, which is expected on kubeadm, k3s and
+ * bare metal. It also happens on EKS self-managed node groups and on Fargate:
+ * EKS only labels instances it manages itself.
+ * https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html
+ */
+const NODE_GROUP_LABELS = [
+  'karpenter.sh/nodepool', // Karpenter v1beta1 and later
+  'eks.amazonaws.com/nodegroup', // EKS managed node groups only
+  'cloud.google.com/gke-nodepool',
+  'kubernetes.azure.com/agentpool', // AKS, alongside the bare 'agentpool' below
+  'agentpool',
+  'kops.k8s.io/instancegroup',
+];
+
+/**
+ * The well-known instance type label, plus the deprecated beta key that older
+ * cloud provider controllers still set.
+ * https://kubernetes.io/docs/reference/labels-annotations-taints/#nodekubernetesioinstance-type
+ */
+const INSTANCE_TYPE_LABELS = [
+  'node.kubernetes.io/instance-type',
+  'beta.kubernetes.io/instance-type',
+];
+
+export function getNodeGroup(node: Node): string | undefined {
+  return getFirstLabelValue(node, NODE_GROUP_LABELS);
+}
+
+export function getInstanceType(node: Node): string | undefined {
+  return getFirstLabelValue(node, INSTANCE_TYPE_LABELS);
+}
+
+function getFirstLabelValue(
+  node: Node,
+  labelKeys: string[]
+): string | undefined {
+  const labels = node.metadata?.labels ?? {};
+  const matchingKey = labelKeys.find((key) => labels[key]);
+  return matchingKey ? labels[matchingKey] : undefined;
+}
+
+/**
+ * Formats the node labels the way kubectl does, so they can be read and
+ * searched as a single string: `key=value`, sorted by key. Valueless labels
+ * keep the separator and render as `key=`, matching `kubectl describe node`.
+ *
+ * Sorting happens on the key rather than the formatted string, because `-` and
+ * `.` sort before `=`: an EKS node carries both `eks.amazonaws.com/nodegroup`
+ * and `eks.amazonaws.com/nodegroup-image`, and formatting first would put the
+ * image below the node group. Compared with `<` rather than localeCompare so
+ * the order matches kubectl's byte ordering; label keys are always ASCII.
+ */
+export function getNodeLabelStrings(node: Node): string[] {
+  return Object.entries(node.metadata?.labels ?? {})
+    .sort(([leftKey], [rightKey]) => compareKeys(leftKey, rightKey))
+    .map(([key, value]) => `${key}=${value}`);
+}
+
+function compareKeys(left: string, right: string): number {
+  if (left === right) {
+    return 0;
+  }
+  return left < right ? -1 : 1;
+}
+
+/**
+ * Formats the node taints the way kubectl does: `key=value:Effect`, with the
+ * value omitted when the taint has none.
+ */
+export function getNodeTaintStrings(node: Node): string[] {
+  return (node.spec?.taints ?? []).map(
+    ({ key, value, effect }) => `${key}${value ? `=${value}` : ''}:${effect}`
+  );
+}

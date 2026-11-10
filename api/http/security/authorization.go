@@ -68,7 +68,7 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 		return false
 	}
 
-	if userAccessesCount > 1 || (userAccessesCount == 1 && teamAccessesCount == 1) {
+	if userAccessesCount > 1 || (userAccessesCount >= 1 && teamAccessesCount >= 1) {
 		return false
 	}
 

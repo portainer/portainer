@@ -20,7 +20,6 @@ import (
 	"github.com/docker/cli/cli/command"
 	cmdcompose "github.com/docker/compose/v2/cmd/compose"
 	"github.com/docker/compose/v2/pkg/api"
-	"github.com/docker/compose/v2/pkg/compose"
 	"github.com/docker/compose/v2/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"github.com/sirupsen/logrus"
@@ -152,12 +151,16 @@ func (c *ComposeDeployer) Run(ctx context.Context, filePaths []string, serviceNa
 
 // Remove stops and removes containers
 func (c *ComposeDeployer) Remove(ctx context.Context, projectName string, filePaths []string, options libstack.RemoveOptions) error {
+	// WithCli replaces the context with Background internally, so we capture the
+	// caller's context here to preserve cancellation and the deployment timeout.
+	callerCtx := ctx
+
 	if err := libstack.WithCli(ctx,
 		libstack.DockerCliOptions{Host: options.Host, Registries: options.Registries},
-		func(ctx context.Context, cli *command.DockerCli) error {
-			composeService := compose.NewComposeService(cli)
+		func(_ context.Context, cli *command.DockerCli) error {
+			composeService := c.createComposeServiceFn(cli)
 
-			return composeService.Down(ctx, projectName, api.DownOptions{RemoveOrphans: true, Volumes: options.Volumes})
+			return composeService.Down(callerCtx, projectName, api.DownOptions{RemoveOrphans: true, Volumes: options.Volumes})
 		}); err != nil {
 		return fmt.Errorf("compose down operation failed: %w", err)
 	}

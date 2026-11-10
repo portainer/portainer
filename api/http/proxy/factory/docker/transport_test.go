@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/docker/docker/api/types/container"
@@ -15,11 +16,18 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhttp/response"
+	sigtest "github.com/portainer/portainer/pkg/testhelpers"
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// ProxyDockerRequest reads the FIPS global, so tests driving it need the mode set.
+func init() {
+	fips.InitFIPS(false)
+}
 
 func TestTransport_updateDefaultGitBranch(t *testing.T) {
 	t.Parallel()
@@ -320,6 +328,7 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		}))
 
 		require.NoError(t, tx.ResourceControl().Create(authorization.NewPrivateResourceControl("16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4", portainer.NetworkResourceControl, std1.ID)))
+		require.NoError(t, tx.ResourceControl().Create(authorization.NewPrivateResourceControl("mycontainerid", portainer.ContainerResourceControl, std1.ID)))
 
 		return nil
 	}))
@@ -336,6 +345,7 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 		{http.MethodDelete, "/networks/16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4"}:          struct{}{},
 		{http.MethodPost, "/networks/create"}:                                                                      network.CreateResponse{ID: "16e37c629e88694663791dc738fd37affb908d7b85ce00a20680675d10554fd4"},
 		{http.MethodPost, "/networks/prune"}:                                                                       struct{}{},
+		{http.MethodGet, "/containers/mycontainer/json"}:                                                           container.InspectResponse{ContainerJSONBase: &container.ContainerJSONBase{ID: "mycontainerid", Name: "mycontainer"}},
 	})
 	defer srv.Close()
 
@@ -346,7 +356,7 @@ func TestTransport_proxyNetworkRequest(t *testing.T) {
 	}
 
 	test := func(method string, url string, token portainer.TokenData) (*http.Response, error) {
-		req := httptest.NewRequest(method, srv.URL+"/v"+version+url, nil)
+		req := httptest.NewRequest(method, srv.URL+"/v"+version+url, strings.NewReader(`{"Container":"mycontainer"}`))
 		req = req.WithContext(security.StoreTokenData(req, &token))
 		require.NotNil(t, req)
 
@@ -914,249 +924,127 @@ func TestTransport_proxyContainerRequest(t *testing.T) {
 	require.NoError(t, r.Body.Close())
 }
 
-func TestTrimDockerVersion(t *testing.T) {
-	testCases := []struct {
+// noopReverseTunnelService absorbs the keep-alive an Edge environment sends after
+// a successful request.
+type noopReverseTunnelService struct {
+	portainer.ReverseTunnelService
+}
+
+func (s *noopReverseTunnelService) UpdateLastActivity(endpointID portainer.EndpointID) {}
+
+// proxyForSignatureTest sends a request through proxyDockerRequest and returns the
+// headers the daemon received. The path is deliberately outside
+// prefixProxyFuncMap so the request falls straight through to the daemon.
+func proxyForSignatureTest(t *testing.T, endpointType portainer.EndpointType, signatureService portainer.DigitalSignatureService, fipsMode bool) (http.Header, error) {
+	t.Helper()
+
+	var capturedHeaders http.Header
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		capturedHeaders = r.Header.Clone()
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	transport := &Transport{
+		endpoint:             &portainer.Endpoint{URL: srv.URL, Type: endpointType},
+		signatureService:     signatureService,
+		reverseTunnelService: &noopReverseTunnelService{},
+		HTTPTransport:        &http.Transport{},
+	}
+
+	req := httptest.NewRequest(http.MethodGet, srv.URL+"/info", nil)
+	req.RequestURI = ""
+
+	resp, err := transport.proxyDockerRequest(req, fipsMode)
+	if resp != nil {
+		require.NoError(t, resp.Body.Close())
+	}
+
+	return capturedHeaders, err
+}
+
+func TestTransport_proxyDockerRequest_SignsOnlyOutsideFIPSMode(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
 		name         string
-		urlPath      string
-		expectedPath string
+		endpointType portainer.EndpointType
+		fipsMode     bool
+		wantSigned   bool
 	}{
 		{
-			name:         "no version",
-			urlPath:      "/containers/1/json",
-			expectedPath: "/containers/1/json",
+			name:         "agent environment outside FIPS mode is signed",
+			endpointType: portainer.AgentOnDockerEnvironment,
+			fipsMode:     false,
+			wantSigned:   true,
 		},
 		{
-			name:         "minor version",
-			urlPath:      "/v1.47/containers/1/json",
-			expectedPath: "/containers/1/json",
+			name:         "edge agent environment outside FIPS mode is signed",
+			endpointType: portainer.EdgeAgentOnDockerEnvironment,
+			fipsMode:     false,
+			wantSigned:   true,
 		},
 		{
-			name:         "patch version",
-			urlPath:      "/v1.47.0/containers/1/json",
-			expectedPath: "/containers/1/json",
+			name:         "agent environment in FIPS mode is unsigned",
+			endpointType: portainer.AgentOnDockerEnvironment,
+			fipsMode:     true,
+			wantSigned:   false,
 		},
 		{
-			name:         "leading zero in minor version",
-			urlPath:      "/v01.47/containers/1/json",
-			expectedPath: "/containers/1/json",
+			name:         "edge agent environment in FIPS mode is unsigned",
+			endpointType: portainer.EdgeAgentOnDockerEnvironment,
+			fipsMode:     true,
+			wantSigned:   false,
+		},
+		// The signature is only ever meant for agents, so a plain Docker
+		// environment stays unsigned in either mode.
+		{
+			name:         "plain docker environment outside FIPS mode is unsigned",
+			endpointType: portainer.DockerEnvironment,
+			fipsMode:     false,
+			wantSigned:   false,
 		},
 		{
-			name:         "leading zero in minor version and patch version",
-			urlPath:      "/v01.47.0/containers/1/json",
-			expectedPath: "/containers/1/json",
-		},
-		{
-			name:         "many patch versions",
-			urlPath:      "/v1.47.0.0.0.0/containers/1/json",
-			expectedPath: "/containers/1/json",
-		},
-		{
-			name:         "patch version and word in version",
-			urlPath:      "/v1.47.0-beta/containers/1/json",
-			expectedPath: "/v1.47.0-beta/containers/1/json",
-		},
-		{
-			name:         "minor version and word in version",
-			urlPath:      "/v1.47-beta/containers/1/json",
-			expectedPath: "/v1.47-beta/containers/1/json",
-		},
-
-		// agent proxy requests
-		{
-			name:         "doesn't trim agent v1 proxy request",
-			urlPath:      "/v1/containers/1/json",
-			expectedPath: "/v1/containers/1/json",
-		},
-		{
-			name:         "doesn't trim agent v2 proxy request",
-			urlPath:      "/v2/containers/1/json",
-			expectedPath: "/v2/containers/1/json",
-		},
-		{
-			name:         "doesn't trim agent ping proxy request",
-			urlPath:      "/ping",
-			expectedPath: "/ping",
-		},
-		{
-			name:         "doesn't trim agent api metrics proxy request",
-			urlPath:      "/api/metrics",
-			expectedPath: "/api/metrics",
-		},
-		{
-			name:         "doesn't trim agent diagnostics proxy request",
-			urlPath:      "/diagnostics",
-			expectedPath: "/diagnostics",
-		},
-		{
-			name:         "doesn't trim agent agents proxy request",
-			urlPath:      "/agents",
-			expectedPath: "/agents",
-		},
-		{
-			name:         "doesn't trim agent host proxy request",
-			urlPath:      "/host/info",
-			expectedPath: "/host/info",
-		},
-		{
-			name:         "doesn't trim agent browse proxy request",
-			urlPath:      "/browse/ls",
-			expectedPath: "/browse/ls",
-		},
-		{
-			name:         "doesn't trim agent websocket proxy request",
-			urlPath:      "/websocket/attach",
-			expectedPath: "/websocket/attach",
-		},
-		{
-			name:         "doesn't trim agent kubernetes proxy request",
-			urlPath:      "/kubernetes",
-			expectedPath: "/kubernetes",
-		},
-
-		{
-			name:         "leading zero in minor version only",
-			urlPath:      "/v1.047/containers/1/json",
-			expectedPath: "/containers/1/json",
-		},
-		{
-			name:         "multi-digit major version",
-			urlPath:      "/v11.0/containers/1/json",
-			expectedPath: "/containers/1/json",
-		},
-		{
-			name:         "versioned agent-like prefix is trimmed",
-			urlPath:      "/v2.0/containers/1/json",
-			expectedPath: "/containers/1/json",
-		},
-		{
-			name:         "doesn't trim version-like resource name",
-			urlPath:      "/volumes/v1.2",
-			expectedPath: "/volumes/v1.2",
-		},
-		{
-			name:         "doesn't trim version-like segment after prefix",
-			urlPath:      "/networks/v1.47/json",
-			expectedPath: "/networks/v1.47/json",
-		},
-		{
-			name:         "empty path",
-			urlPath:      "",
-			expectedPath: ".",
-		},
-		{
-			name:         "root path only",
-			urlPath:      "/",
-			expectedPath: "/",
-		},
-
-		// trailing slashes
-		{
-			name:         "trailing slash not preserved after trim",
-			urlPath:      "/v1.47/containers/1/json/",
-			expectedPath: "/containers/1/json",
-		},
-		{
-			name:         "version with trailing slash only",
-			urlPath:      "/v1.47/",
-			expectedPath: "/",
-		},
-		{
-			name:         "version with no trailing content",
-			urlPath:      "/v1.47",
-			expectedPath: "/",
-		},
-		{
-			name:         "double slash after version are not preserved",
-			urlPath:      "/v1.47//containers/1/json",
-			expectedPath: "/containers/1/json",
-		},
-		{
-			name:         "trailing slash without version removed",
-			urlPath:      "/containers/1/json/",
-			expectedPath: "/containers/1/json",
-		},
-
-		// percent encoding
-		{
-			name:         "percent-encoded segment preserved after trim",
-			urlPath:      "/v1.47/containers/%2e%2e/json",
-			expectedPath: "/containers/%2e%2e/json",
-		},
-		{
-			name:         "percent-encoded slash in remainder preserved",
-			urlPath:      "/v1.47/containers/%2F/json",
-			expectedPath: "/containers/%2F/json",
-		},
-		{
-			name:         "percent-encoded dot in version not trimmed",
-			urlPath:      "/v1%2e47/containers/1/json",
-			expectedPath: "/v1%2e47/containers/1/json",
-		},
-		{
-			name:         "percent-encoded slash right after version",
-			urlPath:      "/v1.47%2Fcontainers/1/json",
-			expectedPath: "/v1.47%2Fcontainers/1/json",
-		},
-		{
-			name:         "percent-encoded space in resource name preserved",
-			urlPath:      "/v1.47/volumes/my%20volume",
-			expectedPath: "/volumes/my%20volume",
-		},
-		{
-			name:         "multiple version segments",
-			urlPath:      "/v1.47/v1.41/containers/1/json",
-			expectedPath: "/v1.41/containers/1/json",
-		},
-		{
-			name:         "three version segments",
-			urlPath:      "/v1.47/v1.41/v1.20/containers/1/json",
-			expectedPath: "/v1.41/v1.20/containers/1/json",
-		},
-		{
-			name:         "multiple leading-zero versions",
-			urlPath:      "/v01.47/v01.41/containers/1/json",
-			expectedPath: "/v01.41/containers/1/json",
-		},
-		{
-			name:         "slash between versions",
-			urlPath:      "/v1.47//v1.41/containers/1/json",
-			expectedPath: "/v1.41/containers/1/json",
+			name:         "plain docker environment in FIPS mode is unsigned",
+			endpointType: portainer.DockerEnvironment,
+			fipsMode:     true,
+			wantSigned:   false,
 		},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			actualPath := TrimDockerVersion(tc.urlPath)
-			require.Equal(t, tc.expectedPath, actualPath)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			headers, err := proxyForSignatureTest(t, test.endpointType, sigtest.NewSignatureService(t), test.fipsMode)
+			require.NoError(t, err)
+
+			if test.wantSigned {
+				require.NotEmpty(t, headers.Get(portainer.PortainerAgentPublicKeyHeader))
+				require.NotEmpty(t, headers.Get(portainer.PortainerAgentSignatureHeader))
+			} else {
+				require.Empty(t, headers.Get(portainer.PortainerAgentPublicKeyHeader))
+				require.Empty(t, headers.Get(portainer.PortainerAgentSignatureHeader))
+			}
 		})
 	}
 }
 
-func TestContainsEncodedSeparator(t *testing.T) {
+// In FIPS mode the signature must never be computed, not merely dropped after the
+// fact, so a signature service that always fails must not break the request.
+func TestTransport_proxyDockerRequest_FIPSModeNeverCreatesSignature(t *testing.T) {
 	t.Parallel()
 
-	testCases := []struct {
-		name        string
-		escapedPath string
-		expected    bool
-	}{
-		{"encoded slash", "/exec%2fabc123%2fstart", true},
-		{"encoded slash upper", "/exec%2Fabc123%2Fstart", true},
-		{"encoded slash mixed case", "/images%2Falpine%2fget", true},
-		{"encoded backslash", "/exec%5cabc123", true},
-		{"encoded backslash upper", "/exec%5Cabc123", true},
-		{"literal slashes", "/containers/abc123/json", false},
-		{"literal slashes with dots", "/distribution/docker.io/portainerci/agent/json", false},
-		{"image tag with colon", "/images/nginx:latest/json", false},
-		{"other encoded char is allowed", "/images/nginx%3Alatest/json", false},
-		{"empty", "", false},
-	}
+	_, err := proxyForSignatureTest(t, portainer.AgentOnDockerEnvironment, sigtest.NewFailingSignatureService(), true)
+	require.NoError(t, err)
+}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			require.Equal(t, tc.expected, ContainsEncodedSeparator(tc.escapedPath))
-		})
-	}
+func TestTransport_proxyDockerRequest_SignatureFailurePropagatesOutsideFIPSMode(t *testing.T) {
+	t.Parallel()
+
+	_, err := proxyForSignatureTest(t, portainer.AgentOnDockerEnvironment, sigtest.NewFailingSignatureService(), false)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "signature failure")
 }
 
 func TestTransport_ProxyDockerRequest_rejectsEncodedSeparator(t *testing.T) {
@@ -1200,4 +1088,184 @@ func TestTransport_ProxyDockerRequest_rejectsEncodedSeparator(t *testing.T) {
 	require.NotNil(t, r)
 	require.Equal(t, http.StatusOK, r.StatusCode)
 	require.NoError(t, r.Body.Close())
+}
+
+func TestTransport_proxyBuildRequest_NetworkMode(t *testing.T) {
+	t.Parallel()
+
+	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	std := portainer.User{ID: 2, Username: "std", Role: portainer.StandardUserRole}
+
+	_, ds := datastore.MustNewTestStore(t, true, false)
+
+	err := ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		if err := tx.User().Create(&admin); err != nil {
+			return err
+		}
+
+		if err := tx.User().Create(&std); err != nil {
+			return err
+		}
+
+		if err := tx.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "env"}); err != nil {
+			return err
+		}
+
+		return tx.ResourceControl().Create(authorization.NewPrivateResourceControl("ownernetid", portainer.NetworkResourceControl, admin.ID))
+	})
+	require.NoError(t, err)
+
+	srv, version := mockDockerAPIServer(t, RoutesDefinition{
+		{http.MethodPost, "/build"}:              map[string]any{},
+		{http.MethodGet, "/networks/ownernet"}:   network.Inspect{ID: "ownernetid", Name: "ownernet"},
+		{http.MethodGet, "/networks/ownernetid"}: network.Inspect{ID: "ownernetid", Name: "ownernet"},
+		{http.MethodGet, "/networks/hostid"}:     network.Inspect{ID: "hostid", Name: "host"},
+	})
+	t.Cleanup(srv.Close)
+
+	transport := &Transport{
+		endpoint:      &portainer.Endpoint{ID: 1, URL: srv.URL},
+		dataStore:     ds,
+		HTTPTransport: &http.Transport{},
+	}
+
+	f := func(user portainer.User, query string, contentType string, body string, wantStatus int) {
+		t.Helper()
+
+		req := httptest.NewRequest(http.MethodPost, srv.URL+"/v"+version+"/build"+query, strings.NewReader(body))
+		if contentType != "" {
+			req.Header.Set("Content-Type", contentType)
+		}
+		req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role}))
+
+		resp, err := transport.proxyBuildRequest(req, "/build")
+		require.NoError(t, err)
+		require.Equal(t, wantStatus, resp.StatusCode)
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// a build without networkmode needs no authorization
+	f(std, "", "", "FROM scratch", http.StatusOK)
+
+	// building on Docker's built-in host network needs no authorization
+	f(std, "?networkmode=host", "", "FROM scratch", http.StatusOK)
+
+	// referencing Docker's built-in host network by ID needs no authorization either
+	f(std, "?networkmode=hostid", "", "FROM scratch", http.StatusOK)
+
+	// building on a network privately owned by another user is forbidden
+	f(std, "?networkmode=ownernet", "", "FROM scratch", http.StatusForbidden)
+
+	// referencing that network by ID is forbidden too
+	f(std, "?networkmode=ownernetid", "", "FROM scratch", http.StatusForbidden)
+
+	// smuggling networkmode through a form encoded body, which the daemon also reads, is forbidden
+	f(std, "", "application/x-www-form-urlencoded", "networkmode=ownernet", http.StatusForbidden)
+
+	// a repeated networkmode cannot hide a forbidden value behind an allowed one
+	f(std, "?networkmode=host&networkmode=ownernet", "", "FROM scratch", http.StatusForbidden)
+
+	// administrators may build on any network
+	f(admin, "?networkmode=ownernet", "", "FROM scratch", http.StatusOK)
+}
+
+func TestTransport_proxyNetworkRequest_ConnectionContainer(t *testing.T) {
+	t.Parallel()
+
+	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	attacker := portainer.User{ID: 2, Username: "attacker", Role: portainer.StandardUserRole}
+	victim := portainer.User{ID: 3, Username: "victim", Role: portainer.StandardUserRole}
+
+	_, ds := datastore.MustNewTestStore(t, true, false)
+
+	err := ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		for _, user := range []*portainer.User{&admin, &attacker, &victim} {
+			if err := tx.User().Create(user); err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "env"}); err != nil {
+			return err
+		}
+
+		for _, rc := range []*portainer.ResourceControl{
+			authorization.NewPrivateResourceControl("attackernetid", portainer.NetworkResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimnetid", portainer.NetworkResourceControl, victim.ID),
+			authorization.NewPrivateResourceControl("attackerctrid", portainer.ContainerResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimctrid", portainer.ContainerResourceControl, victim.ID),
+		} {
+			if err := tx.ResourceControl().Create(rc); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	require.NoError(t, err)
+
+	routes := RoutesDefinition{}
+	for _, name := range []string{"attackernet", "victimnet"} {
+		routes[[2]string{http.MethodGet, "/networks/" + name}] = network.Inspect{ID: name + "id", Name: name}
+		routes[[2]string{http.MethodPost, "/networks/" + name + "/connect"}] = struct{}{}
+		routes[[2]string{http.MethodPost, "/networks/" + name + "/disconnect"}] = struct{}{}
+	}
+
+	for _, name := range []string{"attackerctr", "victimctr", "orphanctr"} {
+		inspect := container.InspectResponse{ContainerJSONBase: &container.ContainerJSONBase{ID: name + "id", Name: name}, Config: &container.Config{}}
+		routes[[2]string{http.MethodGet, "/containers/" + name + "/json"}] = inspect
+		routes[[2]string{http.MethodGet, "/containers/" + name + "id/json"}] = inspect
+	}
+
+	srv, version := mockDockerAPIServer(t, routes)
+	t.Cleanup(srv.Close)
+
+	transport := &Transport{
+		endpoint:      &portainer.Endpoint{ID: 1, URL: srv.URL},
+		dataStore:     ds,
+		HTTPTransport: &http.Transport{},
+	}
+
+	f := func(user portainer.User, action string, networkName string, body string, wantStatus int) {
+		t.Helper()
+
+		url := "/networks/" + networkName + "/" + action
+		req := httptest.NewRequest(http.MethodPost, srv.URL+"/v"+version+url, strings.NewReader(body))
+		req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role}))
+
+		resp, err := transport.proxyNetworkRequest(req, url)
+		require.NoError(t, err)
+		require.Equal(t, wantStatus, resp.StatusCode)
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// connecting an owned container to an owned network is allowed
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr"}`, http.StatusOK)
+
+	// disconnecting an owned container from an owned network is allowed
+	f(attacker, "disconnect", "attackernet", `{"Container":"attackerctr"}`, http.StatusOK)
+
+	// connecting an owned container to another user's network is forbidden
+	f(attacker, "connect", "victimnet", `{"Container":"attackerctr"}`, http.StatusForbidden)
+
+	// pulling another user's container into an owned network is forbidden
+	f(attacker, "connect", "attackernet", `{"Container":"victimctr"}`, http.StatusForbidden)
+
+	// referencing that container by ID is forbidden too
+	f(attacker, "connect", "attackernet", `{"Container":"victimctrid"}`, http.StatusForbidden)
+
+	// a lowercase key, which the daemon also accepts, is forbidden too
+	f(attacker, "connect", "attackernet", `{"container":"victimctr"}`, http.StatusForbidden)
+
+	// a duplicated key, where the daemon uses the last value, is forbidden too
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","Container":"victimctr"}`, http.StatusForbidden)
+
+	// connecting a container with no resource control at all is forbidden
+	f(attacker, "connect", "attackernet", `{"Container":"orphanctr"}`, http.StatusForbidden)
+
+	// disconnecting another user's container from an owned network is forbidden
+	f(attacker, "disconnect", "attackernet", `{"Container":"victimctr","Force":true}`, http.StatusForbidden)
+
+	// administrators may connect any container to any network
+	f(admin, "connect", "victimnet", `{"Container":"attackerctr"}`, http.StatusOK)
 }

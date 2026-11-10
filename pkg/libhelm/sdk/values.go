@@ -84,7 +84,7 @@ func (hspm *HelmSDKPackageManager) getValues(getOpts options.GetOptions) (releas
 		Msg("Getting values")
 
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(getOpts.Namespace), getOpts.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(getOpts.Namespace), getOpts.KubernetesClusterAccess, getOpts.ReleaseStorage)
 	if err != nil {
 		log.Error().
 			Str("context", "HelmClient").

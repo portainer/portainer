@@ -14,7 +14,24 @@ type contextKey int
 const (
 	contextAuthenticationKey contextKey = iota
 	contextRestrictedRequest
+	contextScopedTokenData
 )
+
+// StoreScopedTokenData stores the restrictions carried by the token that authenticated
+// the request. Stored alongside, not instead of, the TokenData holding the identity.
+func StoreScopedTokenData(ctx context.Context, tokenData *portainer.ScopedTokenData) context.Context {
+	return context.WithValue(ctx, contextScopedTokenData, tokenData)
+}
+
+// RetrieveScopedTokenData returns the token restrictions stored in the request context.
+func RetrieveScopedTokenData(request *http.Request) (*portainer.ScopedTokenData, error) {
+	tokenData, ok := request.Context().Value(contextScopedTokenData).(*portainer.ScopedTokenData)
+	if !ok {
+		return nil, errors.New("unable to find scoped JWT data in request context")
+	}
+
+	return tokenData, nil
+}
 
 // StoreTokenData stores a TokenData object inside the request context and returns the enhanced context.
 func StoreTokenData(request *http.Request, tokenData *portainer.TokenData) context.Context {

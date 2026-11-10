@@ -68,8 +68,10 @@ export function NodeView() {
       />
       <>
         <WidgetTabs tabs={tabs} currentTabIndex={currentTabIndex} />
-        {tabs[currentTabIndex].widget}
-        <NodeApplicationsDatatable />
+        <div className="space-y-4">
+          {tabs[currentTabIndex].widget}
+          <NodeApplicationsDatatable />
+        </div>
       </>
     </>
   );
@@ -87,18 +89,11 @@ function buildTabs(
       name: 'Node',
       icon: HardDrive,
       widget: (
-        <div className="row">
-          <div className="col-sm-12">
-            <Widget>
-              <WidgetBody>
-                <NodeDetails
-                  nodeName={nodeName}
-                  environmentId={environmentId}
-                />
-              </WidgetBody>
-            </Widget>
-          </div>
-        </div>
+        <Widget className="mx-4">
+          <WidgetBody>
+            <NodeDetails nodeName={nodeName} environmentId={environmentId} />
+          </WidgetBody>
+        </Widget>
       ),
       selectedTabParam: 'namespace',
     },

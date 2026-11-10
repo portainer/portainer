@@ -11,7 +11,9 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/segmentio/encoding/json"
 	"github.com/stretchr/testify/require"
@@ -297,4 +299,111 @@ func TestDecorateContainerCreationOperation_BindMountRestrictions(t *testing.T) 
 	}, map[string]any{
 		"HostConfig": map[string]any{"Binds": []string{"normalvol:/data"}},
 	}, false, false)
+}
+
+func TestDecorateContainerCreationOperation_NetworkResourceControl(t *testing.T) {
+	t.Parallel()
+
+	networkRoutes := func(name, id string) RoutesDefinition {
+		return RoutesDefinition{
+			{http.MethodGet, "/networks/" + name}: network.Inspect{ID: id, Name: name},
+			{http.MethodGet, "/networks/" + id}:   network.Inspect{ID: id, Name: name},
+		}
+	}
+
+	f := func(extraRoutes RoutesDefinition, body map[string]any, setup func(t *testing.T, fx *containerCreationFixtures), wantForbidden bool) {
+		t.Helper()
+
+		fx := newContainerCreationFixtures(t, extraRoutes)
+
+		if setup != nil {
+			setup(t, fx)
+		}
+
+		resp, err := fx.newTransport().decorateContainerCreationOperation(fx.newRequest(t, body, fx.stdUser), containerObjectIdentifier, portainer.ContainerResourceControl)
+		require.NotNil(t, resp)
+
+		if wantForbidden {
+			require.ErrorIs(t, err, ErrNetworkAccessForbidden)
+			require.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+			return
+		}
+
+		require.NoError(t, err)
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// an unspecified NetworkMode (engine default) needs no authorization
+	f(nil, map[string]any{}, nil, false)
+
+	// joining Docker's built-in bridge network needs no authorization
+	f(nil, map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "bridge"},
+	}, nil, false)
+
+	// joining another container's network namespace is out of scope here (SEC-75)
+	f(nil, map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "container:abc123"},
+	}, nil, false)
+
+	// the UI also keys EndpointsConfig by the bridge network mode
+	f(nil, map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "bridge"},
+		"NetworkingConfig": map[string]any{
+			"EndpointsConfig": map[string]any{"bridge": map[string]any{}},
+		},
+	}, nil, false)
+
+	// the UI also keys EndpointsConfig by the container network mode
+	f(nil, map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "container:abc123"},
+		"NetworkingConfig": map[string]any{
+			"EndpointsConfig": map[string]any{"container:abc123": map[string]any{}},
+		},
+	}, nil, false)
+
+	// joining Docker's built-in bridge network by ID needs no authorization
+	f(networkRoutes("bridge", "bridgeid"), map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "bridgeid"},
+		"NetworkingConfig": map[string]any{
+			"EndpointsConfig": map[string]any{"bridgeid": map[string]any{}},
+		},
+	}, nil, false)
+
+	// joining a named network with no resource control at all is forbidden
+	f(networkRoutes("ownernet", "ownernetid"), map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "ownernet"},
+	}, nil, true)
+
+	// joining a named network privately owned by another user is forbidden
+	f(networkRoutes("ownernet", "ownernetid"), map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "ownernet"},
+	}, func(t *testing.T, fx *containerCreationFixtures) {
+		t.Helper()
+
+		err := fx.ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return tx.ResourceControl().Create(authorization.NewPrivateResourceControl("ownernetid", portainer.NetworkResourceControl, fx.adminUser.ID))
+		})
+		require.NoError(t, err)
+	}, true)
+
+	// joining a named network privately owned by the caller is allowed
+	f(networkRoutes("mynet", "mynetid"), map[string]any{
+		"HostConfig": map[string]any{"NetworkMode": "mynet"},
+	}, func(t *testing.T, fx *containerCreationFixtures) {
+		t.Helper()
+
+		err := fx.ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			return tx.ResourceControl().Create(authorization.NewPrivateResourceControl("mynetid", portainer.NetworkResourceControl, fx.stdUser.ID))
+		})
+		require.NoError(t, err)
+	}, false)
+
+	// a network referenced only through NetworkingConfig.EndpointsConfig is authorized too
+	f(networkRoutes("ownernet", "ownernetid"), map[string]any{
+		"NetworkingConfig": map[string]any{
+			"EndpointsConfig": map[string]any{"ownernet": map[string]any{}},
+		},
+	}, nil, true)
 }

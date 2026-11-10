@@ -1,5 +1,5 @@
 <p align="center">
-  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/app/assets/images/portainer-github-banner.png?raw=true' />
+  <img title="portainer" src='https://github.com/portainer/portainer/blob/HEAD/app/assets/images/portainer-github-banner.png?raw=true' />
 </p>
 
 **Portainer Community Edition** is a free, lightweight container management UI for Docker, Swarm, Podman, Kubernetes, and ACI environments. It is provided as-is, at no cost, for the convenience of homelab operators, hobbyists, students, and anyone experimenting with containers on their own hardware.

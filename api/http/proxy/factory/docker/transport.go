@@ -22,6 +22,9 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/slicesx"
+	"github.com/portainer/portainer/api/stacks/stackutils"
+	"github.com/portainer/portainer/pkg/fips"
+	httprequest "github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/docker/docker/api/types/network"
@@ -30,8 +33,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/encoding/json"
 )
-
-var apiVersionRe = regexp.MustCompile(`^/v[0-9.]+(/|$)`)
 
 type (
 	// Transport is a custom transport for Docker API reverse proxy. It allows
@@ -136,15 +137,23 @@ func isAdminOnlyRoute(method string, path string) bool {
 // ProxyDockerRequest intercepts a Docker API request and apply logic based
 // on the requested operation.
 func (transport *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
+	return transport.proxyDockerRequest(request, fips.FIPSMode())
+}
+
+func (transport *Transport) proxyDockerRequest(request *http.Request, fipsMode bool) (*http.Response, error) {
 	// A percent-encoded path separator lets a request dodge the operation authorization.
 	// Docker API paths never need encoded separators, so reject them outright.
-	if ContainsEncodedSeparator(request.URL.EscapedPath()) {
+	if httprequest.ContainsEncodedSeparator(request.URL.EscapedPath()) {
 		return utils.WriteAccessDeniedResponse()
 	}
 
-	unversionedPath := TrimDockerVersion(request.URL.Path)
+	unversionedPath := httprequest.TrimDockerVersion(request.URL.Path)
 
-	if transport.endpoint.Type == portainer.AgentOnDockerEnvironment || transport.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+	// The agent verifies this signature unless it is running in FIPS mode, where it
+	// relies on mTLS instead. Skip sending it to match that behaviour.
+	if (transport.endpoint.Type == portainer.AgentOnDockerEnvironment ||
+		transport.endpoint.Type == portainer.EdgeAgentOnDockerEnvironment) &&
+		!fipsMode {
 		signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 		if err != nil {
 			return nil, err
@@ -416,7 +425,7 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request, unversion
 		request.Method == http.MethodPost && match(requestPath, "/networks/*/disconnect"):
 
 		networkID := path.Base(path.Dir(requestPath))
-		return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
+		return transport.networkConnectionOperation(request, networkID)
 
 	case request.Method == http.MethodGet && match(requestPath, "/networks/*"):
 		return transport.rewriteOperation(request, transport.networkInspectOperation)
@@ -496,11 +505,46 @@ func (transport *Transport) proxyBuildRequest(request *http.Request, unversioned
 		return transport.administratorOperation(request)
 	}
 
+	if err := transport.authorizeBuildNetworks(request); err != nil {
+		if errors.Is(err, ErrNetworkAccessForbidden) {
+			return utils.WriteAccessDeniedResponse()
+		}
+
+		return nil, err
+	}
+
 	if err := transport.updateDefaultGitBranch(request); err != nil {
 		return nil, err
 	}
 
 	return transport.interceptAndRewriteRequest(request, buildOperation)
+}
+
+func (transport *Transport) authorizeBuildNetworks(request *http.Request) error {
+	networkModes, err := BuildNetworkModes(request)
+	if err != nil {
+		return err
+	}
+
+	networkNames := stackutils.ReferencedNetworkNames(networkModes)
+	if len(networkNames) == 0 {
+		return nil
+	}
+
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return nil
+	}
+
+	getClient := func() (*dockerclient.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	}
+
+	return transport.authorizeReferencedNetworks(tokenData.ID, networkNames, getClient)
 }
 
 func (transport *Transport) updateDefaultGitBranch(request *http.Request) error {
@@ -645,17 +689,62 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 		return nil, err
 	}
 
-	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
-	if resourceControl != nil {
-		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
-			return utils.WriteAccessDeniedResponse()
-		}
-		return transport.executeDockerRequest(request)
+	getClient := func() (*dockerclient.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
 	}
 
-	client, err := transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	canAccess, err := transport.userCanAccessResource(tokenData.ID, userTeamIDs, resourceControls, getClient, resourceID, dockerResourceID, resourceType)
 	if err != nil {
 		return nil, err
+	}
+
+	if !canAccess {
+		return utils.WriteAccessDeniedResponse()
+	}
+
+	return transport.executeDockerRequest(request)
+}
+
+func (transport *Transport) userCanAccessResources(userID portainer.UserID, resourceIDs []string, resourceType portainer.ResourceControlType, getClient func() (*dockerclient.Client, error)) (bool, error) {
+	if len(resourceIDs) == 0 {
+		return true, nil
+	}
+
+	teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
+	if err != nil {
+		return false, err
+	}
+
+	userTeamIDs := authorization.TeamIDs(teamMemberships)
+
+	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
+	if err != nil {
+		return false, err
+	}
+
+	for _, resourceID := range resourceIDs {
+		canAccess, err := transport.userCanAccessResource(userID, userTeamIDs, resourceControls, getClient, resourceID, "", resourceType)
+		if err != nil {
+			return false, err
+		}
+
+		if !canAccess {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+func (transport *Transport) userCanAccessResource(userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControls []portainer.ResourceControl, getClient func() (*dockerclient.Client, error), resourceID string, dockerResourceID string, resourceType portainer.ResourceControlType) (bool, error) {
+	resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+	if resourceControl != nil {
+		return authorization.UserCanAccessResource(userID, userTeamIDs, resourceControl), nil
+	}
+
+	client, err := getClient()
+	if err != nil {
+		return false, err
 	}
 	defer logs.CloseAndLogErr(client)
 
@@ -663,15 +752,12 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 	// so get the real resource ID and retry with it
 	resourceID, err = getDockerResourceUUID(client, resourceType, resourceID)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
 	resourceControl = authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
 	if resourceControl != nil {
-		if !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
-			return utils.WriteAccessDeniedResponse()
-		}
-		return transport.executeDockerRequest(request)
+		return authorization.UserCanAccessResource(userID, userTeamIDs, resourceControl), nil
 	}
 
 	// If we still can't find the RC by provided ID or "real" (docker-extracted) ID
@@ -682,14 +768,10 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 	}
 	inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(client, dockerResourceID, resourceType, resourceControls)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
-		return utils.WriteAccessDeniedResponse()
-	}
-
-	return transport.executeDockerRequest(request)
+	return inheritedResourceControl != nil && authorization.UserCanAccessResource(userID, userTeamIDs, inheritedResourceControl), nil
 }
 
 func getDockerResourceUUID(client *dockerclient.Client, resourceType portainer.ResourceControlType, resourceId string) (string, error) {
@@ -979,22 +1061,4 @@ func (transport *Transport) fetchEndpointSecuritySettings() (*portainer.Endpoint
 	}
 
 	return &endpoint.SecuritySettings, nil
-}
-
-func ContainsEncodedSeparator(escapedPath string) bool {
-	lower := strings.ToLower(escapedPath)
-	return strings.Contains(lower, "%2f") || strings.Contains(lower, "%5c")
-}
-
-func TrimDockerVersion(urlPath string) string {
-	cleanedPath := path.Clean(urlPath)
-
-	if strings.HasPrefix(cleanedPath, "/v2/") ||
-		strings.HasPrefix(cleanedPath, "v2/") ||
-		strings.HasPrefix(cleanedPath, "/v1/") ||
-		strings.HasPrefix(cleanedPath, "v1/") {
-		return cleanedPath
-	}
-
-	return apiVersionRe.ReplaceAllString(cleanedPath, "/")
 }

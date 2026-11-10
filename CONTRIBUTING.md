@@ -7,7 +7,7 @@ Some basic conventions for contributing to this project.
 Please make sure that there aren't existing pull requests attempting to address the issue mentioned. Likewise, please check for issues related to update, as someone else may be working on the issue in a branch or fork.
 
 - Please open a discussion in a new issue / existing issue to talk about the changes you'd like to bring
-- Develop in a topic branch, not master/develop
+- Develop in a topic branch based on the default branch, and open your pull request against it
 
 When creating a new branch, prefix it with the _type_ of the change (see **Commit Message Format** below), followed by a slash and a short kebab-case description:
 
@@ -181,6 +181,6 @@ Generated files live in `app/react/portainer/generated-api/portainer/`. Do **not
 
 ## Licensing
 
-See the [LICENSE](https://github.com/portainer/portainer/blob/develop/LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
+See the [LICENSE](https://github.com/portainer/portainer/blob/HEAD/LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
 
 We may ask you to sign a [Contributor License Agreement (CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement) for larger changes.

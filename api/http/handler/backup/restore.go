@@ -2,11 +2,12 @@ package backup
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net/http"
 
-	"github.com/pkg/errors"
 	operations "github.com/portainer/portainer/api/backup"
+	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/security/setuptoken"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -54,10 +55,24 @@ func (h *Handler) restore(w http.ResponseWriter, r *http.Request) *httperror.Han
 	var archiveReader io.Reader = bytes.NewReader(payload.FileContent)
 	err = operations.RestoreArchive(archiveReader, payload.Password, h.filestorePath, h.gate, h.dataStore, h.shutdownTrigger)
 	if err != nil {
-		return httperror.InternalServerError("Failed to restore the backup", err)
+		return restoreError(err)
 	}
 
 	return nil
+}
+
+// restoreError maps a restore failure to the right status code. A backup that does
+// not match this server's fips mode is a bad request, not a server error.
+func restoreError(err error) *httperror.HandlerError {
+	switch {
+	case errors.Is(err, operations.ErrPasswordRequiredInFIPSMode),
+		errors.Is(err, crypto.ErrNonFIPSEncryptedFileInFIPSMode),
+		errors.Is(err, crypto.ErrFIPSEncryptedFileInNonFIPSMode),
+		errors.Is(err, crypto.ErrNonFIPSApprovedEncryptionInFIPSMode):
+		return httperror.BadRequest("Cannot restore this backup", err)
+	}
+
+	return httperror.InternalServerError("Failed to restore the backup", err)
 }
 
 func decodeForm(r *http.Request, p *restorePayload) error {
