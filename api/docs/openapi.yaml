@@ -102,9 +102,9 @@ info:
     ```
   license:
     name: zlib
-    url: https://github.com/portainer/portainer/blob/develop/LICENSE
+    url: https://github.com/portainer/portainer/blob/HEAD/LICENSE
   title: PortainerCE API
-  version: 2.45.0
+  version: 2.45.3
 paths:
   /auth:
     post:
@@ -1623,6 +1623,8 @@ paths:
                 $ref: "#/components/schemas/portainer.EndpointGroup"
         "400":
           description: Invalid request
+        "403":
+          description: Renaming the default 'Unassigned' group is not allowed
         "404":
           description: EndpointGroup not found
         "500":
@@ -3330,6 +3332,8 @@ paths:
         Tests connectivity for a GitOps source, applying optional overrides to
         the stored configuration.
 
+        The test ignores the name and interval fields. To send any other field, the user must be the owner of the source or an administrator. Other users can only test the stored settings.
+
         **Access policy**: authenticated
       operationId: GitOpsSourcesTestById
       parameters:
@@ -3344,8 +3348,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/sources.GitSourceUpdatePayload"
-        description: Optional connection overrides; omitted fields fall back to stored
-          values
+        description: Optional changes to the stored settings, used only for this test. A
+          field that is not sent keeps its stored value. Fields other than name
+          and interval need write access to the source
       responses:
         "200":
           description: Connection test result
@@ -3356,7 +3361,8 @@ paths:
         "400":
           description: Invalid request payload
         "403":
-          description: Access denied
+          description: Access denied, or the request changes settings and the user has no
+            write access to the source
         "404":
           description: Source not found
         "500":
@@ -11204,6 +11210,8 @@ paths:
           description: Permission denied
         "404":
           description: User not found
+        "409":
+          description: User is the last administrator
         "500":
           description: Server error
       security:
@@ -11280,7 +11288,7 @@ paths:
         "404":
           description: User not found
         "409":
-          description: Username already exist
+          description: Username already exist or the user is the last administrator
         "500":
           description: Server error
       security:

@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/docker/stats"
 	"github.com/portainer/portainer/api/http/handler/docker/utils"
 	"github.com/portainer/portainer/api/http/middlewares"
@@ -112,12 +113,16 @@ func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) *httperror.H
 			return httperror.InternalServerError("Unable to retrieve Docker volumes", err)
 		}
 
+		// Volume ResourceControls are keyed by "<name>_<dockerID>" (see Transport.getVolumeResourceID),
+		// so volumes must be looked up the same way the proxy would.
+		dockerID := docker.EngineID(info)
+
 		var volumes []*volume.Volume
 		if volumes, err = uac.FilterByResourceControl(volumesRes.Volumes, user, context.UserMemberships, func(item *volume.Volume) (*portainer.ResourceControl, error) {
 			if item == nil {
 				return nil, errors.New("Found nil volume in volumes list")
 			}
-			return uac.VolumeResourceControlGetter(tx, endpoint.ID)(*item)
+			return uac.VolumeResourceControlGetter(tx, endpoint.ID, dockerID)(*item)
 		}); err != nil {
 			return err
 		}

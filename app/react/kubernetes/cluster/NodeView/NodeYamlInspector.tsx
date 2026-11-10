@@ -14,21 +14,17 @@ export function NodeYamlInspector({
     isYaml: true,
   });
   return (
-    <div className="row">
-      <div className="col-sm-12">
-        <Widget>
-          <WidgetBody>
-            <YAMLInspector
-              identifier="node-yaml"
-              data={nodeYamlQuery.data || ''}
-              data-cy="node-yaml"
-              isLoading={nodeYamlQuery.isInitialLoading}
-              isError={nodeYamlQuery.isError}
-              hideMessage
-            />
-          </WidgetBody>
-        </Widget>
-      </div>
-    </div>
+    <Widget className="mx-4">
+      <WidgetBody>
+        <YAMLInspector
+          identifier="node-yaml"
+          data={nodeYamlQuery.data || ''}
+          data-cy="node-yaml"
+          isLoading={nodeYamlQuery.isInitialLoading}
+          isError={nodeYamlQuery.isError}
+          hideMessage
+        />
+      </WidgetBody>
+    </Widget>
   );
 }

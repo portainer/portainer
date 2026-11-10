@@ -123,13 +123,6 @@ export function TableActions({
   }
 
   async function handleRemoveDevice(devices: Environment[]) {
-    removeMutation.mutate(
-      devices.map((d) => ({ id: d.Id, name: d.Name })),
-      {
-        onSuccess() {
-          notifySuccess('Success', 'Edge devices were hidden successfully');
-        },
-      }
-    );
+    removeMutation.mutate(devices.map((d) => ({ id: d.Id, name: d.Name })));
   }
 }

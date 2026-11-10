@@ -221,7 +221,7 @@ async function getAgentEnvironmentRateLimits(
 ) {
   try {
     const { data } = await axios.get<PullRateLimits>(
-      buildUrl(environmentId, `${envType}/v2/dockerhub/${registryId}`)
+      buildUrl(environmentId, `agent/${envType}/v2/dockerhub/${registryId}`)
     );
     return data;
   } catch (e) {

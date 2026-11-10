@@ -27,29 +27,25 @@ export function FormActions({
 }: PropsWithChildren<Props>) {
   return (
     <FormSection title="Actions">
-      <div className="form-group">
-        <div className="col-sm-12">
-          <div className="item-center flex gap-3">
-            <LoadingButton
-              className="!ml-0"
-              loadingText={loadingText}
-              isLoading={isLoading}
-              disabled={!isValid}
-              data-cy={dataCy}
-              icon={submitIcon}
-            >
-              {submitLabel}
-            </LoadingButton>
+      <div className="item-center flex gap-3">
+        <LoadingButton
+          className="!ml-0"
+          loadingText={loadingText}
+          isLoading={isLoading}
+          disabled={!isValid}
+          data-cy={dataCy}
+          icon={submitIcon}
+        >
+          {submitLabel}
+        </LoadingButton>
 
-            {!isValid && (
-              <div className="hidden" data-cy="errors">
-                {JSON.stringify(errors)}
-              </div>
-            )}
-
-            {children}
+        {!isValid && (
+          <div className="hidden" data-cy="errors">
+            {JSON.stringify(errors)}
           </div>
-        </div>
+        )}
+
+        {children}
       </div>
     </FormSection>
   );

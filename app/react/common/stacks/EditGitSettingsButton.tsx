@@ -9,7 +9,13 @@ import { Button } from '@@/buttons';
 
 import { EditGitSettingsModal } from './EditGitSettings/EditGitSettingsModal';
 
-export function EditGitSettingsButton({ stack }: { stack: Stack }) {
+export function EditGitSettingsButton({
+  stack,
+  label = 'Edit stack settings',
+}: {
+  stack: Stack | undefined;
+  label?: string;
+}) {
   const {
     params: { openGitSettings },
   } = useCurrentStateAndParams();
@@ -23,10 +29,11 @@ export function EditGitSettingsButton({ stack }: { stack: Stack }) {
         onClick={() => setIsOpen(true)}
         data-cy="edit-git-settings-button"
         icon={PencilIcon}
+        disabled={!stack}
       >
-        Edit Git settings
+        {label}
       </Button>
-      {isOpen && (
+      {stack && isOpen && (
         <EditGitSettingsModal stack={stack} onClose={() => setIsOpen(false)} />
       )}
     </Authorized>

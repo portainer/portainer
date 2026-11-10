@@ -25,9 +25,7 @@ export function useApplicationPods(
         return [app];
       }
       const appSelector = app?.spec?.selector;
-      const labelSelector = matchLabelsToLabelSelectorValue(
-        appSelector?.matchLabels
-      );
+      const labelSelector = matchLabelsToLabelSelectorValue(appSelector);
 
       // get all pods in the namespace using the application selector as the label selector query param
       const pods = await getPods(environmentId, namespace, labelSelector);

@@ -3,7 +3,10 @@ import { useMemo, useState } from 'react';
 import { useTags } from '@/portainer/tags/queries';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { EnvironmentsQueryParams } from '@/react/portainer/environments/environment.service';
-import { useEnvironmentList } from '@/react/portainer/environments/queries';
+import {
+  useEnvironmentList,
+  getSortType,
+} from '@/react/portainer/environments/queries/useEnvironmentList';
 import { EdgeTypes, Environment } from '@/react/portainer/environments/types';
 import { AutomationTestingProps } from '@/types';
 import {
@@ -34,7 +37,7 @@ export function EdgeGroupAssociationTable({
     pageLimit: tableState.pageSize,
     page: page + 1,
     search: tableState.search,
-    sort: tableState.sortBy?.id as 'Group' | 'Name',
+    sort: getSortType(tableState.sortBy?.id),
     order: tableState.sortBy?.desc ? 'desc' : 'asc',
     types: EdgeTypes,
     excludeIds: excludeEnvironments?.map((env) => env.Id),

@@ -45,6 +45,14 @@ func (c *Client) DeleteDynamic(ctx context.Context, manifests []string) (string,
 	}
 	mapper := restmapper.NewDiscoveryRESTMapper(groupResources)
 
+	configuredNamespace, wasExplicitlySet, err := c.factory.ToRawKubeConfigLoader().Namespace()
+	if err != nil {
+		return "", fmt.Errorf("failed to get configured namespace: %w", err)
+	}
+	if !wasExplicitlySet {
+		configuredNamespace = ""
+	}
+
 	var results []string
 	var errs error
 
@@ -75,7 +83,7 @@ func (c *Client) DeleteDynamic(ctx context.Context, manifests []string) (string,
 		}
 
 		for _, document := range documents {
-			result, err := c.deleteResource(ctx, dynamicClient, mapper, []byte(document))
+			result, err := c.deleteResource(ctx, dynamicClient, mapper, configuredNamespace, []byte(document))
 			if err != nil {
 				errs = errors.Join(errs, err)
 				continue
@@ -98,7 +106,7 @@ func (c *Client) DeleteDynamic(ctx context.Context, manifests []string) (string,
 }
 
 // deleteResource deletes a single resource
-func (c *Client) deleteResource(ctx context.Context, dynamicClient dynamic.Interface, mapper meta.RESTMapper, resourceYAML []byte) (string, error) {
+func (c *Client) deleteResource(ctx context.Context, dynamicClient dynamic.Interface, mapper meta.RESTMapper, configuredNamespace string, resourceYAML []byte) (string, error) {
 	// Decode YAML to unstructured object
 	obj := &unstructured.Unstructured{}
 	decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(string(resourceYAML)), 4096)
@@ -124,17 +132,18 @@ func (c *Client) deleteResource(ctx context.Context, dynamicClient dynamic.Inter
 		return "", fmt.Errorf("failed to map resource type %s: %w", gvk.String(), err)
 	}
 
-	// Get namespace (if applicable)
-	namespace := obj.GetNamespace()
 	name := obj.GetName()
 
 	// Get the dynamic resource client
 	var resourceClient dynamic.ResourceInterface
+	var namespace string
 	if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
-		// Namespaced resource
-		if namespace == "" {
-			namespace = "default"
+		// use the client's configured namespace, the same way ApplyDynamic does
+		namespace, err = resolveNamespace(configuredNamespace, obj.GetNamespace())
+		if err != nil {
+			return "", fmt.Errorf("namespace conflict for %s %q: %w", gvk.Kind, name, err)
 		}
+
 		resourceClient = dynamicClient.Resource(mapping.Resource).Namespace(namespace)
 	} else {
 		// Cluster-scoped resource

@@ -24,3 +24,9 @@ func (kcl *testKubeClient) GetEvents(namespace string, resourceId string) ([]mod
 func (kcl *testKubeClient) DeletePod(namespace, name string) error             { return nil }
 func (kcl *testKubeClient) RestartPod(namespace, name string) error            { return nil }
 func (kcl *testKubeClient) SupportsPodRestart(_ context.Context) (bool, error) { return false, nil }
+
+// Namespace
+func (kcl *testKubeClient) NamespaceAccessPoliciesDeleteNamespace(ns string) error { return nil }
+func (kcl *testKubeClient) GetNamespace(name string) (portainer.K8sNamespaceInfo, error) {
+	return portainer.K8sNamespaceInfo{Name: name}, nil
+}

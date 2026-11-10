@@ -5,12 +5,15 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
@@ -31,10 +34,16 @@ type partialServiceSpec struct {
 			} `json:"Privileges"`
 			Mounts []PartialMount `json:"Mounts"`
 		} `json:"ContainerSpec"`
+		Networks []partialNetworkAttachment `json:"Networks"`
 	} `json:"TaskTemplate"`
+	Networks []partialNetworkAttachment `json:"Networks"`
 }
 
-func CheckServiceBodyRestrictions(request *http.Request, securitySettings *portainer.EndpointSecuritySettings, getClient func() (*client.Client, error)) error {
+type partialNetworkAttachment struct {
+	Target string `json:"Target"`
+}
+
+func CheckServiceBodyRestrictions(request *http.Request, securitySettings *portainer.EndpointSecuritySettings, getClient func(nodeName string) (*client.Client, error), authorizeNetworks func(networkNames []string) error) error {
 	defer logs.CloseAndLogErr(request.Body)
 
 	body, err := io.ReadAll(request.Body)
@@ -83,28 +92,68 @@ func CheckServiceBodyRestrictions(request *http.Request, securitySettings *porta
 		}
 
 		if len(referencedVolumes) > 0 {
-			cli, err := getClient()
+			isBind, err := anyClusterNodeHasBindMountVolume(request.Context(), getClient, referencedVolumes)
 			if err != nil {
 				return err
 			}
-			defer logs.CloseAndLogErr(cli)
 
-			for _, name := range referencedVolumes {
-				isBind, err := docker.InspectVolumeIsBindMount(request.Context(), cli, name)
-				if err != nil {
-					return err
-				}
-
-				if isBind {
-					return ErrBindMountsForbidden
-				}
+			if isBind {
+				return ErrBindMountsForbidden
 			}
 		}
+	}
+
+	var networkTargets []string
+	for _, attachment := range slices.Concat(spec.TaskTemplate.Networks, spec.Networks) {
+		networkTargets = append(networkTargets, attachment.Target)
+	}
+
+	if err := authorizeNetworks(stackutils.ReferencedNetworkNames(networkTargets)); err != nil {
+		return err
 	}
 
 	request.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	return nil
+}
+
+func anyClusterNodeHasBindMountVolume(ctx context.Context, getClient func(nodeName string) (*client.Client, error), volumeNames []string) (bool, error) {
+	cli, err := getClient("")
+	if err != nil {
+		return false, err
+	}
+	defer logs.CloseAndLogErr(cli)
+
+	nodes, err := cli.NodeList(ctx, swarm.NodeListOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	nodeClients := make([]*client.Client, 0, len(nodes))
+	for _, node := range nodes {
+		nodeClient, err := getClient(node.Description.Hostname)
+		if err != nil {
+			return false, err
+		}
+
+		defer logs.CloseAndLogErr(nodeClient)
+		nodeClients = append(nodeClients, nodeClient)
+	}
+
+	for _, name := range volumeNames {
+		for _, nodeClient := range nodeClients {
+			isBind, err := docker.InspectVolumeIsBindMount(ctx, nodeClient, name)
+			if err != nil {
+				return false, err
+			}
+
+			if isBind {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
 }
 
 func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, endpointID portainer.EndpointID, serviceID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
@@ -178,6 +227,14 @@ func selectorServiceLabels(responseObject map[string]any) map[string]any {
 	return nil
 }
 
+func (transport *Transport) serviceNetworksAuthorizer(userID portainer.UserID, getClient func(nodeName string) (*client.Client, error)) func(networkNames []string) error {
+	return func(networkNames []string) error {
+		return transport.authorizeReferencedNetworks(userID, networkNames, func() (*client.Client, error) {
+			return getClient("")
+		})
+	}
+}
+
 func (transport *Transport) decorateServiceCreationOperation(request *http.Request) (*http.Response, error) {
 	isAdminOrEndpointAdmin, err := transport.isAdminOrEndpointAdmin(request)
 	if err != nil {
@@ -193,13 +250,16 @@ func (transport *Transport) decorateServiceCreationOperation(request *http.Reque
 		return nil, err
 	}
 
-	getClient := func() (*client.Client, error) {
-		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
-
-		return transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader, nil)
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
 	}
 
-	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient); err != nil {
+	getClient := func(nodeName string) (*client.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName, nil)
+	}
+
+	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient, transport.serviceNetworksAuthorizer(tokenData.ID, getClient)); err != nil {
 		return &http.Response{
 			StatusCode: http.StatusForbidden,
 			Body:       io.NopCloser(bytes.NewBufferString("Access denied: insufficient permissions to create service with specified configuration")),
@@ -228,13 +288,16 @@ func (transport *Transport) decorateServiceUpdateOperation(request *http.Request
 		return nil, err
 	}
 
-	getClient := func() (*client.Client, error) {
-		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
-
-		return transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader, nil)
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
 	}
 
-	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient); err != nil {
+	getClient := func(nodeName string) (*client.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName, nil)
+	}
+
+	if err := CheckServiceBodyRestrictions(request, securitySettings, getClient, transport.serviceNetworksAuthorizer(tokenData.ID, getClient)); err != nil {
 		return &http.Response{
 			StatusCode: http.StatusForbidden,
 			Body:       io.NopCloser(bytes.NewBufferString("Access denied: insufficient permissions to update service with specified configuration")),

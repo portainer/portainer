@@ -1,6 +1,6 @@
 import { StackType } from '@/react/common/stacks/types';
-import { useEnvironmentId } from '@/react/hooks/useEnvironmentId';
 import { useApiVersion } from '@/react/docker/proxy/queries/useVersion';
+import { EnvironmentId } from '@/react/portainer/environments/types';
 
 import { SwitchField } from '@@/form-components/SwitchField';
 import { FormSection } from '@@/form-components/FormSection';
@@ -9,11 +9,16 @@ interface Props {
   stackType: StackType | undefined;
   checked: boolean;
   onChange: (value: boolean) => void;
+  environmentId: EnvironmentId;
 }
 
-export function PruneField({ stackType, checked, onChange }: Props) {
-  const envId = useEnvironmentId();
-  const apiVersion = useApiVersion(envId);
+export function PruneField({
+  stackType,
+  checked,
+  onChange,
+  environmentId,
+}: Props) {
+  const apiVersion = useApiVersion(environmentId);
 
   if (
     (stackType !== StackType.DockerSwarm &&

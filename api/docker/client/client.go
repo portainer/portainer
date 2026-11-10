@@ -11,6 +11,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/pkg/fips"
 	"github.com/portainer/portainer/pkg/libhttp/ssrf"
 
 	"github.com/rs/zerolog/log"
@@ -97,24 +98,38 @@ func createTCPClient(endpoint *portainer.Endpoint, timeout *time.Duration) (*cli
 	return client.NewClientWithOpts(opts...)
 }
 
+// agentClientHeaders builds the headers every request to an agent is decorated with.
+func agentClientHeaders(signatureService portainer.DigitalSignatureService, nodeName string, fipsMode bool) (map[string]string, error) {
+	headers := map[string]string{}
+
+	// The agent verifies this signature unless it is running in FIPS mode, where it
+	// relies on mTLS instead. Skip sending it to match that behaviour.
+	if !fipsMode {
+		signature, err := signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+		if err != nil {
+			return nil, err
+		}
+
+		headers[portainer.PortainerAgentPublicKeyHeader] = signatureService.EncodedPublicKey()
+		headers[portainer.PortainerAgentSignatureHeader] = signature
+	}
+
+	if nodeName != "" {
+		headers[portainer.PortainerAgentTargetHeader] = nodeName
+	}
+
+	return headers, nil
+}
+
 func createAgentClient(endpoint *portainer.Endpoint, endpointURL string, signatureService portainer.DigitalSignatureService, nodeName string, timeout *time.Duration) (*client.Client, error) {
 	httpCli, err := httpClient(endpoint, timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	signature, err := signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	headers, err := agentClientHeaders(signatureService, nodeName, fips.FIPSMode())
 	if err != nil {
 		return nil, err
-	}
-
-	headers := map[string]string{
-		portainer.PortainerAgentPublicKeyHeader: signatureService.EncodedPublicKey(),
-		portainer.PortainerAgentSignatureHeader: signature,
-	}
-
-	if nodeName != "" {
-		headers[portainer.PortainerAgentTargetHeader] = nodeName
 	}
 
 	opts := []client.Opt{

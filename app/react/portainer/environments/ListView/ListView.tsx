@@ -1,6 +1,5 @@
 import { useStore } from 'zustand';
 
-import { notifySuccess } from '@/portainer/services/notifications';
 import { environmentStore } from '@/react/hooks/current-environment-store';
 
 import { PageHeader } from '@@/PageHeader';
@@ -47,15 +46,7 @@ export function ListView() {
         id: e.Id,
         deleteCluster: false,
         name: e.Name,
-      })),
-      {
-        onSuccess() {
-          notifySuccess(
-            'Environments successfully removed',
-            environmentsToDelete.map((e) => e.Name).join(', ')
-          );
-        },
-      }
+      }))
     );
   }
 }

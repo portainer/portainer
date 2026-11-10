@@ -6,6 +6,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -84,15 +85,22 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 		return httperror.BadRequest("Password does not meet the minimum strength requirements", nil)
 	}
 
-	user.Password, err = handler.CryptoService.Hash(payload.NewPassword)
+	hashedPassword, err := handler.CryptoService.Hash(payload.NewPassword)
 	if err != nil {
 		return httperror.InternalServerError("Unable to hash user password", errCryptoHashFailure)
 	}
 
-	user.TokenIssueAt = time.Now().Unix()
+	if err := handler.DataStore.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		current, err := tx.User().Read(user.ID)
+		if err != nil {
+			return err
+		}
 
-	err = handler.DataStore.User().Update(user.ID, user)
-	if err != nil {
+		current.Password = hashedPassword
+		current.TokenIssueAt = time.Now().Unix()
+
+		return tx.User().Update(current.ID, current)
+	}); err != nil {
 		return httperror.InternalServerError("Unable to persist user changes inside the database", err)
 	}
 

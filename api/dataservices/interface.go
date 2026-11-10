@@ -1,6 +1,8 @@
 package dataservices
 
 import (
+	"io"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/database/models"
 )
@@ -49,6 +51,7 @@ type (
 		Rollback(force bool) error
 		CheckCurrentEdition() error
 		Backup(path string) (string, error)
+		BackupTo(w io.Writer) error
 		Export(filename string) (err error)
 
 		DataStoreTx

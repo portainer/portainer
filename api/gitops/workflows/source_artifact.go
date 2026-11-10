@@ -20,14 +20,16 @@ type gitSourceStore interface {
 // GitSourceAndArtifactForStack returns the git Source and the ArtifactFile matching stackID
 // from the workflow identified by workflowID.
 // Source carries the shared fields (URL, auth, TLS); ArtifactFile carries the file-specific fields (ref, path, hash).
-// Returns nil, nil, nil when workflowID is 0 or no matching entry is found.
+// Returns nil, nil, nil when workflowID is 0, the workflow no longer exists, or no matching entry is found.
 func GitSourceAndArtifactForStack(tx gitSourceStore, userContext source.UserContext, workflowID portainer.WorkflowID, stackID portainer.StackID) (*portainer.Source, *portainer.ArtifactFile, error) {
 	if workflowID == 0 {
 		return nil, nil, nil
 	}
 
 	wf, err := tx.Workflow().Read(workflowID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return nil, nil, nil
+	} else if err != nil {
 		return nil, nil, err
 	}
 
@@ -57,14 +59,16 @@ func GitSourceAndArtifactForStack(tx gitSourceStore, userContext source.UserCont
 }
 
 // GitSourceAndArtifactForEdgeStack returns the git Source and the ArtifactFile matching edgeStackID.
-// Returns nil, nil, nil when workflowID is 0 or no matching entry is found.
+// Returns nil, nil, nil when workflowID is 0, the workflow no longer exists, or no matching entry is found.
 func GitSourceAndArtifactForEdgeStack(tx gitSourceStore, userContext source.UserContext, workflowID portainer.WorkflowID, edgeStackID portainer.EdgeStackID) (*portainer.Source, *portainer.ArtifactFile, error) {
 	if workflowID == 0 {
 		return nil, nil, nil
 	}
 
 	wf, err := tx.Workflow().Read(workflowID)
-	if err != nil {
+	if dataservices.IsErrObjectNotFound(err) {
+		return nil, nil, nil
+	} else if err != nil {
 		return nil, nil, err
 	}
 
@@ -330,13 +334,14 @@ func SaveWorkflowArtifact(tx gitSourceStore, workflowID portainer.WorkflowID, ma
 
 // LoadWorkflowMap fetches workflows by their IDs and returns them keyed by ID.
 func LoadWorkflowMap(tx gitSourceStore, ids set.Set[portainer.WorkflowID]) (map[portainer.WorkflowID]portainer.Workflow, error) {
-	result := make(map[portainer.WorkflowID]portainer.Workflow, len(ids))
-	for id := range ids {
-		wf, err := tx.Workflow().Read(id)
-		if err != nil {
-			return nil, err
-		}
-		result[id] = *wf
+	wfs, err := tx.Workflow().ReadAll(func(w portainer.Workflow) bool { return ids.Contains(w.ID) })
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[portainer.WorkflowID]portainer.Workflow, len(wfs))
+	for _, wf := range wfs {
+		result[wf.ID] = wf
 	}
 
 	return result, nil

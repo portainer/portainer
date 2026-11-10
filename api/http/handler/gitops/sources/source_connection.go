@@ -20,6 +20,7 @@ import (
 // @id GitOpsSourcesTestById
 // @summary Test the connection of a stored source
 // @description Tests connectivity for a GitOps source, applying optional overrides to the stored configuration.
+// @description The test ignores the name and interval fields. To send any other field, the user must be the owner of the source or an administrator. Other users can only test the stored settings.
 // @description **Access policy**: authenticated
 // @tags gitops
 // @security ApiKeyAuth
@@ -27,10 +28,10 @@ import (
 // @accept json
 // @produce json
 // @param id path int true "Source identifier"
-// @param body body GitSourceUpdatePayload false "Optional connection overrides; omitted fields fall back to stored values"
+// @param body body GitSourceUpdatePayload false "Optional changes to the stored settings, used only for this test. A field that is not sent keeps its stored value. Fields other than name and interval need write access to the source"
 // @success 200 {object} ConnectionTestResult "Connection test result"
 // @failure 400 "Invalid request payload"
-// @failure 403 "Access denied"
+// @failure 403 "Access denied, or the request changes settings and the user has no write access to the source"
 // @failure 404 "Source not found"
 // @failure 500 "Server error"
 // @router /gitops/sources/{id}/test [post]
@@ -50,9 +51,10 @@ func (h *Handler) sourceTestConnection(w http.ResponseWriter, r *http.Request) *
 		return httperror.BadRequest("Invalid request payload", err)
 	}
 
+	userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
+
 	var src *portainer.Source
 	if err := h.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 		src, err = tx.Source().Read(userContext, portainer.SourceID(sourceID))
 		return err
 	}); h.dataStore.IsErrObjectNotFound(err) {
@@ -61,6 +63,10 @@ func (h *Handler) sourceTestConnection(w http.ResponseWriter, r *http.Request) *
 		return httperror.Forbidden("Not enough permissions to retrieve source", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find source", err)
+	}
+
+	if hasConnectionOverrides(payload) && !source.UserCanWriteSource(src, userContext) {
+		return httperror.Forbidden("Overriding the source configuration requires write access to the source", source.ErrNotEnoughPermission)
 	}
 
 	if err := ApplyGitSourceChanges(src, payload); errors.Is(err, ErrNotGitSource) {
@@ -115,6 +121,10 @@ func (h *Handler) gitSourceTest(w http.ResponseWriter, r *http.Request) *httperr
 	result := testSourceConnection(r.Context(), h.gitService, src.Git)
 
 	return response.JSON(w, result)
+}
+
+func hasConnectionOverrides(payload GitSourceUpdatePayload) bool {
+	return payload != GitSourceUpdatePayload{Name: payload.Name, Interval: payload.Interval}
 }
 
 // testSourceConnection verifies that a git repository is reachable with the given config.

@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices/source"
 	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
@@ -123,6 +124,20 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	}
 	if !access {
 		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
+	}
+
+	var networkAccess *stackutils.NetworkAccess
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		networkAccess, err = deployments.LoadNetworkAccessTx(tx, endpoint.ID, securityContext.User)
+
+		return err
+	}); err != nil {
+		return httperror.InternalServerError("Unable to load network access information", err)
+	}
+
+	if err := deployments.ValidateStackForUser(r.Context(), stack, endpoint, securityContext.User, networkAccess, handler.StackDeployer, handler.FileService); err != nil {
+		return httperror.Forbidden("Stack files are not allowed for this user", err)
 	}
 
 	if err := handler.startStack(context.TODO(), securityContext.UserID, stack, endpoint, securityContext); err != nil {

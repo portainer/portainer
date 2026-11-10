@@ -5,10 +5,13 @@ import { StackType } from '@/react/common/stacks/types';
 import { baseStackWebhookUrl } from '@/portainer/helpers/webhookHelper';
 import { GitForm } from '@/react/portainer/gitops/GitForm';
 import { useIsStandalone } from '@/react/docker/proxy/queries/useInfo';
-import { useCurrentEnvironment } from '@/react/hooks/useCurrentEnvironment';
 import { getPlatformType } from '@/react/portainer/environments/utils';
-import { PlatformType } from '@/react/portainer/environments/types';
+import {
+  EnvironmentId,
+  PlatformType,
+} from '@/react/portainer/environments/types';
 import { StackName } from '@/react/kubernetes/DeployView/StackName/StackName';
+import { useEnvironment } from '@/react/portainer/environments/queries/useEnvironment';
 
 import { Modal } from '@@/modals/Modal';
 import { TextTip } from '@@/Tip/TextTip';
@@ -27,14 +30,19 @@ export function InnerForm({
   onDismiss,
   isSubmitting,
   webhookId,
+  environmentId,
 }: {
   stackName: string;
   stackType: StackType;
   onDismiss: () => void;
   isSubmitting: boolean;
   webhookId: string;
+  environmentId: EnvironmentId;
 }) {
-  const environmentQuery = useCurrentEnvironment();
+  const environmentQuery = useEnvironment(environmentId);
+  const title = stackName
+    ? `Edit stack settings — ${stackName}`
+    : 'Edit stack settings';
   const platform = environmentQuery.data
     ? getPlatformType(environmentQuery.data.Type)
     : null;
@@ -49,7 +57,7 @@ export function InnerForm({
     <Form>
       <Modal
         onDismiss={onDismiss}
-        aria-label="edit-git-settings"
+        aria-label={title}
         size="xl"
         className="flex h-[80vh] flex-col px-0"
       >
@@ -57,9 +65,7 @@ export function InnerForm({
           title={
             <div className="inline-flex items-center gap-1 px-5">
               <WidgetIcon icon={Settings} />
-              <h2 className="m-0 ml-1 text-base">
-                Edit Git settings — {stackName}
-              </h2>
+              <h2 className="m-0 ml-1 text-base">{title}</h2>
             </div>
           }
         />
@@ -119,6 +125,7 @@ export function InnerForm({
                   stackType={stackType}
                   checked={values.prune}
                   onChange={(value) => setFieldValue('prune', value)}
+                  environmentId={environmentId}
                 />
               )}
             </div>

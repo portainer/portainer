@@ -40,7 +40,7 @@ export function RollbackApplicationButton({
   const router = useRouter();
   const labelSelector = applicationIsKind<Pod>('Pod', app)
     ? ''
-    : matchLabelsToLabelSelectorValue(app?.spec?.selector?.matchLabels);
+    : matchLabelsToLabelSelectorValue(app?.spec?.selector);
   const appRevisionListQuery = useApplicationRevisionList(
     environmentId,
     namespace,

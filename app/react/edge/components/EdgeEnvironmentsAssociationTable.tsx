@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 
-import { useEnvironmentList } from '@/react/portainer/environments/queries';
+import {
+  useEnvironmentList,
+  getSortType,
+} from '@/react/portainer/environments/queries/useEnvironmentList';
 import { EdgeTypes, Environment } from '@/react/portainer/environments/types';
 import { useGroups } from '@/react/portainer/environments/environment-groups/queries';
 import { useTags } from '@/portainer/tags/queries';
@@ -28,7 +31,7 @@ export function EdgeEnvironmentsAssociationTable({
     pageLimit: tableState.pageSize,
     page: page + 1,
     search: tableState.search,
-    sort: tableState.sortBy?.id as 'Group' | 'Name',
+    sort: getSortType(tableState.sortBy?.id),
     order: tableState.sortBy?.desc ? 'desc' : 'asc',
     types: EdgeTypes,
     ...query,

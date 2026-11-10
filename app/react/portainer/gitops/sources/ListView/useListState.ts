@@ -1,8 +1,7 @@
+import { asEnum } from '@/react/utils/enum';
+
 import { buildGroupSortExtras } from '@@/datatables/groupSortState';
-import {
-  asEnum,
-  useTableStateFromUrl,
-} from '@@/datatables/useTableStateFromUrl';
+import { useTableStateFromUrl } from '@@/datatables/useTableStateFromUrl';
 
 import { SourceStatus, SourceType } from '../types';
 

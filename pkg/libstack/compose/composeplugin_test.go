@@ -672,6 +672,40 @@ func Test_MaxConcurrency(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// Ref BE-13439: WithCli discards the caller's context and replaces it with
+// context.Background() before invoking the Docker/Compose operation. Remove must capture
+// the caller's context beforehand and use it for the Down call, so that a cancelled or
+// expired deployment context interrupts the undeploy operation.
+func Test_Remove_PropagatesCallerContext(t *testing.T) {
+	type ctxKey struct{}
+
+	var receivedCtx context.Context
+
+	w := ComposeDeployer{
+		createComposeServiceFn: func(command.Cli, ...compose.Option) api.Compose {
+			return &mockComposeService{
+				downFn: func(ctx context.Context, projectName string, options api.DownOptions) error {
+					receivedCtx = ctx
+					return nil
+				},
+			}
+		},
+	}
+
+	ctx := context.WithValue(t.Context(), ctxKey{}, "undeploy-marker")
+	ctx, cancel := context.WithCancel(ctx)
+	cancel()
+
+	err := w.Remove(ctx, "test-project", nil, libstack.RemoveOptions{})
+	require.NoError(t, err)
+
+	require.NotNil(t, receivedCtx)
+	require.Equal(t, "undeploy-marker", receivedCtx.Value(ctxKey{}),
+		"Down should receive the caller's context, not a fresh context.Background()")
+	require.ErrorIs(t, receivedCtx.Err(), context.Canceled,
+		"a cancelled deployment context should be observable inside the undeploy operation")
+}
+
 func Test_createProject(t *testing.T) {
 	dir := t.TempDir()
 	projectName := "create-project-test"
@@ -1461,8 +1495,17 @@ func createMockComposeService(command.Cli, ...compose.Option) api.Compose {
 type mockComposeService struct {
 	api.Compose
 	maxConcurrency int
+	downFn         func(ctx context.Context, projectName string, options api.DownOptions) error
 }
 
 func (s *mockComposeService) MaxConcurrency(parallel int) {
 	s.maxConcurrency = parallel
+}
+
+func (s *mockComposeService) Down(ctx context.Context, projectName string, options api.DownOptions) error {
+	if s.downFn != nil {
+		return s.downFn(ctx, projectName, options)
+	}
+
+	return nil
 }

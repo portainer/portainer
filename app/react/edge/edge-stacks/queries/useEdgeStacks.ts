@@ -20,7 +20,7 @@ export function useEdgeStacks<T extends EdgeStack[] = EdgeStack[]>({
   refetchInterval?: number | false | ((data?: T) => false | number);
 } = {}) {
   return useQuery({
-    queryKey: queryKeys.base(),
+    queryKey: queryKeys.list(params),
     queryFn: () => getEdgeStacks<T>(params),
     refetchInterval,
     ...withError('Failed loading Edge stack'),

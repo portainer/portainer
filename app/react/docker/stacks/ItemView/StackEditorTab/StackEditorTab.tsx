@@ -117,6 +117,7 @@ export function StackEditorTab({
         isSubmitting={mutation.isLoading}
         isSaved={mutation.isSuccess}
         webhookId={webhookId}
+        environmentId={envQuery.data.Id}
       />
     </Formik>
   );

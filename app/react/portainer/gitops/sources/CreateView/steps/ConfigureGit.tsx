@@ -1,10 +1,13 @@
 import { useFormikContext } from 'formik';
 
+import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
+
 import { Input } from '@@/form-components/Input';
 import { FormControl } from '@@/form-components/FormControl';
 import { SwitchField } from '@@/form-components/SwitchField';
 
 import { IntervalField } from '../../components/IntervalField';
+import { PollingIntervalScopeTip } from '../../components/PollingIntervalScopeTip';
 import { FormValues } from '../type';
 
 import { Authentication } from './Authentication';
@@ -65,6 +68,7 @@ export function ConfigureGit() {
             onChange={(value) => setFieldValue('git.polling.interval', value)}
             errors={errors.git?.polling?.interval}
           />
+          {!isBE && <PollingIntervalScopeTip />}
         </div>
       )}
 

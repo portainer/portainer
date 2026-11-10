@@ -59,6 +59,7 @@ export function EditGitSettingsModal({ stack, onClose }: Props) {
         webhookId={webhookId}
         onDismiss={onClose}
         isSubmitting={mutation.isLoading}
+        environmentId={stack.EndpointId}
       />
     </Formik>
   );

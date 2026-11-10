@@ -5,7 +5,6 @@ import {
   useTableStateFromUrl,
   parseIntOrDefault,
   parsePositiveIntOrNull,
-  asEnum,
 } from './useTableStateFromUrl';
 
 const mockSetState = vi.fn();
@@ -375,25 +374,5 @@ describe('parsePositiveIntOrNull', () => {
 
   it('returns null for undefined', () => {
     expect(parsePositiveIntOrNull(undefined)).toBeNull();
-  });
-});
-
-describe('asEnum', () => {
-  const ALLOWED = new Set(['asc', 'desc'] as const);
-
-  it('returns the value when it is in the allowed set', () => {
-    expect(asEnum('asc', ALLOWED)).toBe('asc');
-  });
-
-  it('returns null when the value is not in the allowed set', () => {
-    expect(asEnum('invalid', ALLOWED)).toBeNull();
-  });
-
-  it('returns null for undefined', () => {
-    expect(asEnum(undefined, ALLOWED)).toBeNull();
-  });
-
-  it('returns null for null', () => {
-    expect(asEnum(null, ALLOWED)).toBeNull();
   });
 });

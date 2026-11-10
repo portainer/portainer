@@ -13,7 +13,9 @@ export function EdgeKeyDisplay({ edgeKey }: { edgeKey: string }) {
 
       <p className="small text-muted mt-2">
         You can read more about pre-staging in the user-guide available{' '}
-        <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a>
+        <a href="https://docs.portainer.io/advanced/how-to-prestage-an-edge-agent-environment">
+          here.
+        </a>
       </p>
 
       <Code>{edgeKey}</Code>

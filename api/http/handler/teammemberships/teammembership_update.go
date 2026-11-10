@@ -80,6 +80,10 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 		return httperror.Forbidden("Permission denied to update the membership", httperrors.ErrResourceAccessDenied)
 	}
 
+	if !securityContext.IsAdmin && membership.UserID == securityContext.UserID {
+		return httperror.Forbidden("Permission denied to change your own team membership", httperrors.ErrResourceAccessDenied)
+	}
+
 	membership.UserID = portainer.UserID(payload.UserID)
 	membership.TeamID = portainer.TeamID(payload.TeamID)
 	membership.Role = portainer.MembershipRole(payload.Role)

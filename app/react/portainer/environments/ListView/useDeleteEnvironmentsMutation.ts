@@ -20,7 +20,8 @@ export function useDeleteEnvironmentsMutation() {
     ) => {
       const resp = await deleteEnvironments(environments);
 
-      if (resp === null) {
+      // a 204 has an empty body, which axios gives as ''
+      if (!resp) {
         return { deleted: environments, errors: [] };
       }
 

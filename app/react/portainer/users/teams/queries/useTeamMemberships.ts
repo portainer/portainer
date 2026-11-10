@@ -9,11 +9,15 @@ import { buildUrl } from './build-url';
 import { buildMembershipUrl } from './build-membership-url';
 import { queryKeys } from './query-keys';
 
-export function useTeamMemberships(id?: TeamId) {
+export function useTeamMemberships(
+  id?: TeamId,
+  { enabled }: { enabled?: boolean } = {}
+) {
   return useQuery({
     queryKey: queryKeys.memberships(id),
     queryFn: () => (id ? getTeamMemberships(id) : getTeamsMemberships()),
     ...withError('Unable to load team memberships'),
+    enabled,
   });
 }
 

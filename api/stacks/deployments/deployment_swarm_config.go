@@ -10,10 +10,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/registryutils"
-	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/stacks/stackutils"
-
-	"github.com/docker/docker/client"
 )
 
 type SwarmStackDeploymentConfig struct {
@@ -23,6 +20,7 @@ type SwarmStackDeploymentConfig struct {
 	prune         bool
 	isAdmin       bool
 	user          *portainer.User
+	networkAccess *stackutils.NetworkAccess
 	pullImage     bool
 	FileService   portainer.FileService
 	StackDeployer StackDeployer
@@ -32,6 +30,11 @@ func CreateSwarmStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityCon
 	user, err := tx.User().Read(securityContext.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("unable to load user information from the database: %w", err)
+	}
+
+	networkAccess, err := LoadNetworkAccessTx(tx, endpoint.ID, user)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load network access information from the database: %w", err)
 	}
 
 	registries, err := tx.Registry().ReadAll()
@@ -50,6 +53,7 @@ func CreateSwarmStackDeploymentConfigTx(tx dataservices.DataStoreTx, securityCon
 		prune:         prune,
 		isAdmin:       securityContext.IsAdmin,
 		user:          user,
+		networkAccess: networkAccess,
 		pullImage:     pullImage,
 		FileService:   fileService,
 		StackDeployer: deployer,
@@ -64,26 +68,8 @@ func (config *SwarmStackDeploymentConfig) Deploy(ctx context.Context) error {
 		return errors.New("file service or stack deployer cannot be nil")
 	}
 
-	isAdminOrEndpointAdmin := stackutils.UserIsAdminOrEndpointAdmin(config.user)
-
-	settings := &config.endpoint.SecuritySettings
-
-	if !isAdminOrEndpointAdmin {
-		var dockerClient *client.Client
-
-		if factory := config.StackDeployer.GetDockerClientFactory(); factory != nil {
-			var err error
-
-			dockerClient, err = factory.CreateClient(config.endpoint, "", nil)
-			if err != nil {
-				return err
-			}
-			defer logs.CloseAndLogErr(dockerClient)
-		}
-
-		if err := stackutils.ValidateStackFiles(config.stack, settings, config.FileService, dockerClient); err != nil {
-			return err
-		}
+	if err := ValidateStackForUser(ctx, config.stack, config.endpoint, config.user, config.networkAccess, config.StackDeployer, config.FileService); err != nil {
+		return err
 	}
 
 	if err := stackutils.ValidateComposeURLs(ctx, config.stack, config.FileService); err != nil {

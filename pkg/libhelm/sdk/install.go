@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"context"
 	"time"
 
 	"github.com/pkg/errors"
@@ -10,6 +11,9 @@ import (
 	"github.com/rs/zerolog/log"
 	"helm.sh/helm/v4/pkg/action"
 	"helm.sh/helm/v4/pkg/kube"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 // Install implements the HelmPackageManager interface by using the Helm SDK to install a chart.
@@ -37,7 +41,7 @@ func (hspm *HelmSDKPackageManager) install(installOpts options.InstallOptions) (
 
 	// Initialize action configuration with kubernetes config
 	actionConfig := new(action.Configuration)
-	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(installOpts.Namespace), installOpts.KubernetesClusterAccess)
+	err := hspm.initActionConfig(actionConfig, namespaceOrDefault(installOpts.Namespace), installOpts.KubernetesClusterAccess, nil)
 	if err != nil {
 		// error is already logged in initActionConfig
 		return nil, errors.Wrap(err, "failed to initialize helm configuration for helm release installation")
@@ -56,6 +60,10 @@ func (hspm *HelmSDKPackageManager) install(installOpts options.InstallOptions) (
 			Err(err).
 			Msg("Failed to initialize helm install client for helm release installation")
 		return nil, errors.Wrap(err, "failed to initialize helm install client for helm release installation")
+	}
+
+	if installClient.CreateNamespace {
+		installClient.CreateNamespace = shouldCreateNamespace(actionConfig, installClient.Namespace)
 	}
 
 	var values map[string]any
@@ -154,6 +162,27 @@ func (hspm *HelmSDKPackageManager) install(installOpts options.InstallOptions) (
 	}, nil
 }
 
+const (
+	// defaultReleaseTimeout is generous so large charts have time to become ready
+	defaultReleaseTimeout = 15 * time.Minute
+	// defaultAtomicReleaseTimeout is longer because rolling back a failed release
+	// adds to the operation time
+	defaultAtomicReleaseTimeout = 30 * time.Minute
+)
+
+// releaseTimeout returns the requested timeout, or the default when none was requested
+func releaseTimeout(requested time.Duration, rollbackOnFailure bool) time.Duration {
+	if requested != 0 {
+		return requested
+	}
+
+	if rollbackOnFailure {
+		return defaultAtomicReleaseTimeout
+	}
+
+	return defaultReleaseTimeout
+}
+
 // initInstallClient initializes the install client with the given options
 // and return the install client.
 func initInstallClient(actionConfig *action.Configuration, installOpts options.InstallOptions) (*action.Install, error) {
@@ -165,7 +194,8 @@ func initInstallClient(actionConfig *action.Configuration, installOpts options.I
 	} else {
 		installClient.WaitStrategy = kube.HookOnlyStrategy
 	}
-	installClient.Timeout = installOpts.Timeout
+	installClient.RollbackOnFailure = installOpts.Atomic
+	installClient.Timeout = releaseTimeout(installOpts.Timeout, installOpts.Atomic)
 	installClient.Version = installOpts.Version
 	if installOpts.DryRun {
 		installClient.DryRunStrategy = action.DryRunClient
@@ -178,11 +208,6 @@ func initInstallClient(actionConfig *action.Configuration, installOpts options.I
 	}
 
 	// Set default values if not specified
-	if installOpts.Timeout == 0 {
-		installClient.Timeout = 15 * time.Minute // set a bigger timeout for large charts
-	} else {
-		installClient.Timeout = installOpts.Timeout
-	}
 	if installOpts.Namespace == "" {
 		installClient.Namespace = "default"
 	} else {
@@ -194,4 +219,51 @@ func initInstallClient(actionConfig *action.Configuration, installOpts options.I
 	}
 
 	return installClient, nil
+}
+
+// shouldCreateNamespace reports whether Helm still has to create the release
+// namespace. Helm v4 server-side applies the namespace when CreateNamespace is set,
+// which patches one that already exists and fails for users who may only read
+// namespaces. A caller forbidden from reading namespaces cannot create one either,
+// so creation is skipped; any other failed check leaves creation to Helm.
+func shouldCreateNamespace(actionConfig *action.Configuration, namespace string) bool {
+	exists, err := releaseNamespaceExists(actionConfig, namespace)
+	if k8serrors.IsForbidden(err) {
+		return false
+	}
+
+	if err != nil {
+		log.Warn().
+			Str("context", "HelmClient").
+			Str("namespace", namespace).
+			Err(err).
+			Msg("unable to check whether the release namespace exists")
+
+		return true
+	}
+
+	return !exists
+}
+
+func releaseNamespaceExists(actionConfig *action.Configuration, namespace string) (bool, error) {
+	restConfig, err := actionConfig.RESTClientGetter.ToRESTConfig()
+	if err != nil {
+		return false, errors.Wrap(err, "failed to build the Kubernetes REST config")
+	}
+
+	clientset, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return false, errors.Wrap(err, "failed to build the Kubernetes client")
+	}
+
+	return namespaceExists(clientset, namespace)
+}
+
+func namespaceExists(clientset kubernetes.Interface, namespace string) (bool, error) {
+	_, err := clientset.CoreV1().Namespaces().Get(context.Background(), namespace, metav1.GetOptions{})
+	if k8serrors.IsNotFound(err) {
+		return false, nil
+	}
+
+	return err == nil, err
 }

@@ -7,16 +7,29 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"testing/synctest"
 
 	"github.com/portainer/portainer/api/archive"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/offlinegate"
+	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/pkg/fips"
 
 	"github.com/stretchr/testify/require"
 )
+
+type hangingDataStore struct {
+	dataservices.DataStore
+	block chan struct{}
+}
+
+func (d *hangingDataStore) BackupTo(w io.Writer) error {
+	<-d.block
+	return nil
+}
 
 func init() {
 	fips.InitFIPS(false)
@@ -126,6 +139,18 @@ func TestEncryptDecrypt_WrongPassword(t *testing.T) {
 
 	_, err = crypto.AesDecrypt(bytes.NewReader(encryptedData), []byte("wrongpassword"))
 	require.Error(t, err)
+}
+
+func Test_backupDb_timesOutWhenBackupToHangs(t *testing.T) {
+	t.Parallel()
+	synctest.Test(t, func(t *testing.T) {
+		ds := &hangingDataStore{DataStore: testhelpers.NewDatastore(), block: make(chan struct{})}
+
+		err := backupDb(t.TempDir(), ds)
+		require.Error(t, err)
+
+		close(ds.block)
+	})
 }
 
 func TestCreateBackupArchive_NoPassword(t *testing.T) {

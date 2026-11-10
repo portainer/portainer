@@ -1,5 +1,8 @@
 import { EnvironmentGroup } from '../types';
 
+export const UNASSIGNED_GROUP_ID = 1;
+export const UNASSIGNED_GROUP_NAME = 'Unassigned';
+
 export function getPlatformLabel(group: EnvironmentGroup): string {
   if (!group.Total || group.Total === 0) {
     return 'Empty';
@@ -21,5 +24,5 @@ export function getPlatformLabel(group: EnvironmentGroup): string {
 }
 
 export function isUngoverned(group: EnvironmentGroup): boolean {
-  return group.Id === 1;
+  return group.Id === UNASSIGNED_GROUP_ID;
 }

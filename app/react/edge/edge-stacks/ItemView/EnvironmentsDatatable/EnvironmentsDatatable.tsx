@@ -1,8 +1,15 @@
 import { HardDrive } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { EdgeStackStatus, StatusType } from '@/react/edge/edge-stacks/types';
-import { useEnvironmentList } from '@/react/portainer/environments/queries';
+import {
+  EdgeStackStatus,
+  StatusType,
+  getEdgeStackStatusType,
+} from '@/react/edge/edge-stacks/types';
+import {
+  useEnvironmentList,
+  getSortType,
+} from '@/react/portainer/environments/queries/useEnvironmentList';
 import { useParamState } from '@/react/hooks/useParamState';
 import { EnvironmentId } from '@/react/portainer/environments/types';
 import { isBE } from '@/react/portainer/feature-flags/feature-flags.service';
@@ -40,16 +47,16 @@ export function EnvironmentsDatatable() {
   });
 
   const [page, setPage] = useState(0);
-  const [statusFilter, setStatusFilter] = useParamState<StatusType>(
+  const [statusFilter, setStatusFilter] = useParamState(
     'status',
-    (value) => (value ? parseInt(value, 10) : undefined)
+    getEdgeStackStatusType
   );
   const tableState = useTableState(settingsStore, tableKey);
   const environmentsQuery = useEnvironmentList({
     pageLimit: tableState.pageSize,
     page: page + 1,
     search: tableState.search,
-    sort: tableState.sortBy?.id as 'Group' | 'Name',
+    sort: getSortType(tableState.sortBy?.id),
     order: tableState.sortBy?.desc ? 'desc' : 'asc',
     edgeStackId: stackId,
     edgeStackStatus: statusFilter,

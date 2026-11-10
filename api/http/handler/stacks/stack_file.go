@@ -94,6 +94,12 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 				return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 			}
 		}
+
+		if stack.Type == portainer.KubernetesStack {
+			if httpErr := handler.authorizeKubernetesStackRead(securityContext, endpoint, stack); httpErr != nil {
+				return httpErr
+			}
+		}
 	}
 
 	var gitConfig *gittypes.RepoConfig

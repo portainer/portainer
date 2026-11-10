@@ -3,12 +3,19 @@ package boltdb
 import (
 	"bytes"
 	"crypto/cipher"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/segmentio/encoding/json"
 )
 
 var errEncryptedStringTooShort = errors.New("encrypted string too short")
+
+// ErrDecryptionFailed is returned when the database contents cannot be decrypted
+// with the loaded encryption key. The key is derived from the secret file and the
+// salt in the data directory, so it means one of those two does not belong to
+// this database.
+var ErrDecryptionFailed = errors.New("could not decrypt the database contents")
 
 // MarshalObject encodes an object to binary format
 func (connection *DbConnection) MarshalObject(object any) ([]byte, error) {
@@ -73,7 +80,7 @@ func decrypt(encrypted []byte, gcm cipher.AEAD) ([]byte, error) {
 
 	plaintextByte, err := gcm.Open(nil, nil, encrypted, nil)
 	if err != nil {
-		return encrypted, errors.Wrap(err, "Error decrypting text")
+		return encrypted, fmt.Errorf("%w: %w", ErrDecryptionFailed, err)
 	}
 
 	return plaintextByte, nil

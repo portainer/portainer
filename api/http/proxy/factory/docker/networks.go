@@ -1,23 +1,89 @@
 package docker
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 
 	"github.com/docker/docker/api/types/network"
 
 	"github.com/docker/docker/client"
+	"github.com/segmentio/encoding/json"
 
 	"github.com/portainer/portainer/api/http/proxy/factory/utils"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 )
 
 const (
 	networkObjectIdentifier = "Id"
 	networkObjectName       = "Name"
 )
+
+func (transport *Transport) authorizeReferencedNetworks(userID portainer.UserID, networkNames []string, getClient func() (*client.Client, error)) error {
+	if len(networkNames) == 0 {
+		return nil
+	}
+
+	access, err := stackutils.LoadNetworkAccess(transport.dataStore.TeamMembership(), transport.dataStore.ResourceControl(), transport.endpoint.ID, userID)
+	if err != nil {
+		return err
+	}
+
+	dockerClient, err := getClient()
+	if err != nil {
+		return err
+	}
+	defer logs.CloseAndLogErr(dockerClient)
+
+	return access.AuthorizeNetworks(context.Background(), dockerClient, networkNames, false)
+}
+
+func (transport *Transport) networkConnectionOperation(request *http.Request, networkID string) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		return transport.executeDockerRequest(request)
+	}
+
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Body = io.NopCloser(bytes.NewReader(body))
+
+	var connection struct {
+		Container string `json:"Container"`
+	}
+	if err := json.Unmarshal(body, &connection); err != nil {
+		return nil, err
+	}
+
+	getClient := func() (*client.Client, error) {
+		return transport.dockerClientFactory.CreateClient(transport.endpoint, request.Header.Get(portainer.PortainerAgentTargetHeader), nil)
+	}
+
+	canAccess, err := transport.userCanAccessResources(tokenData.ID, []string{connection.Container}, portainer.ContainerResourceControl, getClient)
+	if err != nil {
+		return nil, err
+	}
+
+	if !canAccess {
+		return utils.WriteAccessDeniedResponse()
+	}
+
+	return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
+}
 
 func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, endpointID portainer.EndpointID, networkID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 	network, err := dockerClient.NetworkInspect(context.Background(), networkID, network.InspectOptions{})
@@ -86,7 +152,7 @@ func findSystemNetworkResourceControl(networkObject map[string]any) *portainer.R
 	networkID := networkObject[networkObjectIdentifier].(string)
 	networkName := networkObject[networkObjectName].(string)
 
-	if networkName == "bridge" || networkName == "host" || networkName == "ingress" || networkName == "nat" || networkName == "none" {
+	if slices.Contains(stackutils.SystemNetworkNames, networkName) {
 		return authorization.NewSystemResourceControl(networkID, portainer.NetworkResourceControl)
 	}
 

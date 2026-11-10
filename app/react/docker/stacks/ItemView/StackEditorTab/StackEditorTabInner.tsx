@@ -4,7 +4,10 @@ import { useCallback } from 'react';
 
 import { Stack, StackType } from '@/react/common/stacks/types';
 import { PruneField } from '@/react/common/stacks/PruneField';
-import { EnvironmentType } from '@/react/portainer/environments/types';
+import {
+  EnvironmentId,
+  EnvironmentType,
+} from '@/react/portainer/environments/types';
 import { Authorized, useAuthorizations } from '@/react/hooks/useUser';
 
 import { CodeEditor } from '@@/CodeEditor';
@@ -29,6 +32,7 @@ interface StackEditorTabInnerProps {
   isSaved: boolean;
   isSubmitting: boolean;
   webhookId: string;
+  environmentId: EnvironmentId;
 }
 
 export function StackEditorTabInner({
@@ -42,6 +46,7 @@ export function StackEditorTabInner({
   isSaved,
   isSubmitting,
   webhookId,
+  environmentId,
 }: StackEditorTabInnerProps) {
   const { authorized: isAuthorizedToUpdate } = useAuthorizations(
     'PortainerStackUpdate'
@@ -145,6 +150,7 @@ export function StackEditorTabInner({
           stackType={stackType}
           checked={values.prune}
           onChange={(checked) => setFieldValue('prune', checked)}
+          environmentId={environmentId}
         />
       </Authorized>
 

@@ -10,3 +10,21 @@ export function isValidReturnUrl(
     return false;
   }
 }
+
+/** True when `url` differs from `currentUrl` at most by its hash. */
+export function isSameDocumentUrl(
+  url: string,
+  currentUrl = window.location.href
+): boolean {
+  try {
+    const target = new URL(url, currentUrl);
+    const current = new URL(currentUrl);
+    return (
+      target.origin === current.origin &&
+      target.pathname === current.pathname &&
+      target.search === current.search
+    );
+  } catch {
+    return false;
+  }
+}

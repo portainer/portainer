@@ -24,6 +24,10 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
       },
+      fontSize: {
+        // html is pinned to 16px, so this is exactly 10px.
+        '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+      },
       animation: {
         'spin-slow': 'spin 2s linear infinite',
       },

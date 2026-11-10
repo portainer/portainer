@@ -41,6 +41,25 @@ const (
 	pbkdf2SaltLength = 32
 )
 
+var (
+	// ErrFIPSEncryptedFileInNonFIPSMode is returned when a file encrypted by a fips
+	// enabled server is read while fips mode is disabled.
+	ErrFIPSEncryptedFileInNonFIPSMode = errors.New("fips encrypted file detected but fips mode is not enabled")
+
+	// ErrNonFIPSEncryptedFileInFIPSMode is returned when a file encrypted by a server
+	// that was not in fips mode is read while fips mode is enabled.
+	ErrNonFIPSEncryptedFileInFIPSMode = errors.New("fips mode is enabled but non-fips encrypted file detected")
+
+	// ErrNonFIPSApprovedEncryptionInFIPSMode is returned when a file carries no known
+	// encryption header while fips mode is enabled, meaning it is either unencrypted
+	// or uses the legacy format. Neither is fips approved.
+	ErrNonFIPSApprovedEncryptionInFIPSMode = errors.New("fips mode is enabled but the backup was not encrypted in a fips approved way")
+
+	// ErrEncryptedFileTooShort is returned when the input is too short to hold any
+	// encryption header, which no valid encrypted file is.
+	ErrEncryptedFileTooShort = errors.New("encrypted file is too short to be valid")
+)
+
 // AesEncrypt reads from input, encrypts with AES-256 and writes to output. passphrase is used to generate an encryption key
 func AesEncrypt(input io.Reader, output io.Writer, passphrase []byte) error {
 	if fips.FIPSMode() {
@@ -62,16 +81,16 @@ func AesDecrypt(input io.Reader, passphrase []byte) (io.Reader, error) {
 }
 
 func aesDecrypt(input io.Reader, passphrase []byte, fipsMode bool) (io.Reader, error) {
-	// Read file header to determine how it was encrypted
 	inputReader := bufio.NewReader(input)
 	header, err := inputReader.Peek(len(aesGcmFIPSHeader))
-	if err != nil {
+	truncated := errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)
+	if err != nil && !truncated {
 		return nil, fmt.Errorf("error reading encrypted backup file header: %w", err)
 	}
 
 	if strings.HasPrefix(string(header), aesGcmFIPSHeader) {
 		if !fipsMode {
-			return nil, errors.New("fips encrypted file detected but fips mode is not enabled")
+			return nil, ErrFIPSEncryptedFileInNonFIPSMode
 		}
 
 		reader, err := aesDecryptGCMFIPS(inputReader, passphrase)
@@ -84,7 +103,7 @@ func aesDecrypt(input io.Reader, passphrase []byte, fipsMode bool) (io.Reader, e
 
 	if strings.HasPrefix(string(header), aesGcmHeader) {
 		if fipsMode {
-			return nil, errors.New("fips mode is enabled but non-fips encrypted file detected")
+			return nil, ErrNonFIPSEncryptedFileInFIPSMode
 		}
 
 		reader, err := aesDecryptGCM(inputReader, passphrase)
@@ -93,6 +112,17 @@ func aesDecrypt(input io.Reader, passphrase []byte, fipsMode bool) (io.Reader, e
 		}
 
 		return reader, nil
+	}
+
+	if truncated {
+		return nil, ErrEncryptedFileTooShort
+	}
+
+	// The legacy format uses scrypt and AES-OFB, neither of which is fips approved,
+	// so it can only have been produced by a non-fips server. An unencrypted archive
+	// also lands here, and is equally invalid in fips mode.
+	if fipsMode {
+		return nil, ErrNonFIPSApprovedEncryptionInFIPSMode
 	}
 
 	// Use the previous decryption routine which has no header (to support older archives)

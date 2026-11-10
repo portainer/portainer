@@ -30,6 +30,7 @@ type (
 		RestrictedAccess(http.Handler) http.Handler
 		TeamLeaderAccess(http.Handler) http.Handler
 		AuthenticatedAccess(http.Handler) http.Handler
+		AuthenticatedAccessAllowingKubeconfig(http.Handler) http.Handler
 		EdgeComputeOperation(http.Handler) http.Handler
 
 		AuthorizedEndpointOperation(*http.Request, *portainer.Endpoint) error
@@ -62,7 +63,14 @@ type (
 	}
 
 	// tokenLookup looks up a token in the request
-	tokenLookup func(*http.Request) (*portainer.TokenData, error)
+	tokenLookup func(*http.Request) (*portainer.ScopedTokenData, error)
+)
+
+// Scopes accepted by each family of routes. A kubeconfig token is only ever
+// meant to drive kubectl against the Kubernetes environment proxy.
+var (
+	sessionTokenScopes    = []portainer.TokenScope{portainer.DefaultTokenScope}
+	kubernetesProxyScopes = []portainer.TokenScope{portainer.DefaultTokenScope, portainer.KubeconfigTokenScope}
 )
 
 var (
@@ -105,7 +113,7 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h, true)
-	h = bouncer.mwAuthenticatedUser(h)
+	h = bouncer.mwAuthenticatedUser(h, sessionTokenScopes)
 
 	return h
 }
@@ -118,7 +126,7 @@ func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwCheckPortainerAuthorizations(h, false)
-	h = bouncer.mwAuthenticatedUser(h)
+	h = bouncer.mwAuthenticatedUser(h, sessionTokenScopes)
 
 	return h
 }
@@ -132,7 +140,7 @@ func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 	h = bouncer.mwIsTeamLeader(h)
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.mwAuthenticatedUser(h)
+	h = bouncer.mwAuthenticatedUser(h, sessionTokenScopes)
 
 	return h
 }
@@ -144,7 +152,16 @@ func (bouncer *RequestBouncer) TeamLeaderAccess(h http.Handler) http.Handler {
 // and resource filtering.
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.mwAuthenticatedUser(h)
+	h = bouncer.mwAuthenticatedUser(h, sessionTokenScopes)
+
+	return h
+}
+
+// AuthenticatedAccessAllowingKubeconfig is AuthenticatedAccess for the Kubernetes environment proxy,
+// which also accepts the kubeconfig-scoped tokens handed out to kubectl users.
+func (bouncer *RequestBouncer) AuthenticatedAccessAllowingKubeconfig(h http.Handler) http.Handler {
+	h = bouncer.mwUpgradeToRestrictedRequest(h)
+	h = bouncer.mwAuthenticatedUser(h, kubernetesProxyScopes)
 
 	return h
 }
@@ -156,6 +173,10 @@ func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler 
 func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
+		return err
+	}
+
+	if err := authorizedTokenEndpoint(r, endpoint.ID); err != nil {
 		return err
 	}
 
@@ -217,15 +238,38 @@ func (bouncer *RequestBouncer) TrustedEdgeEnvironmentAccess(tx dataservices.Data
 	return nil
 }
 
+// authorizedTokenEndpoint verifies that the token itself may reach the environment,
+// which a kubeconfig token may only do for the environment it was issued for.
+func authorizedTokenEndpoint(r *http.Request, endpointID portainer.EndpointID) error {
+	tokenData, err := RetrieveScopedTokenData(r)
+	if err != nil || tokenData.EndpointID == portainer.UnscopedToken {
+		return nil
+	}
+
+	if tokenData.EndpointID != endpointID {
+		return httperrors.ErrEndpointAccessDenied
+	}
+
+	return nil
+}
+
+func unwrapTokenData(tokenData *portainer.ScopedTokenData, err error) (*portainer.TokenData, error) {
+	if err != nil || tokenData == nil {
+		return nil, err
+	}
+
+	return tokenData.TokenData, nil
+}
+
 // mwAuthenticatedUser authenticates a request by
 // - adding a secure handlers to the response
 // - authenticating the request with a valid token
-func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
+func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler, allowedScopes []portainer.TokenScope) http.Handler {
 	h = bouncer.mwAuthenticateFirst([]tokenLookup{
 		bouncer.apiKeyLookup,
-		bouncer.CookieAuthLookup,
-		bouncer.JWTAuthLookup,
-	}, h)
+		bouncer.cookieAuthLookup,
+		bouncer.jwtAuthLookup,
+	}, h, allowedScopes)
 	h = MWSecureHeaders(h, bouncer.hsts, bouncer.csp)
 
 	return h
@@ -306,7 +350,7 @@ func (bouncer *RequestBouncer) mwIsTeamLeader(next http.Handler) http.Handler {
 
 // mwAuthenticateFirst authenticates a request an auth token.
 // A result of a first succeeded token lookup would be used for the authentication.
-func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, next http.Handler) http.Handler {
+func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, next http.Handler, allowedScopes []portainer.TokenScope) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, hasAPIKey := extractAPIKey(r)
 		_, hasBearerToken := extractBearerToken(r)
@@ -316,7 +360,7 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			return
 		}
 
-		var token *portainer.TokenData
+		var token *portainer.ScopedTokenData
 
 		for _, lookup := range tokenLookups {
 			resultToken, err := lookup(r)
@@ -345,13 +389,24 @@ func (bouncer *RequestBouncer) mwAuthenticateFirst(tokenLookups []tokenLookup, n
 			return
 		}
 
-		ctx := StoreTokenData(r, token)
+		if !slices.Contains(allowedScopes, token.Scope) {
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", ErrTokenScopeNotAllowed)
+
+			return
+		}
+
+		ctx := StoreTokenData(r, token.TokenData)
+		ctx = StoreScopedTokenData(ctx, token)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-// JWTAuthLookup looks up a valid bearer in the request.
+// CookieAuthLookup looks up a valid cookie in the request.
 func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.TokenData, error) {
+	return unwrapTokenData(bouncer.cookieAuthLookup(r))
+}
+
+func (bouncer *RequestBouncer) cookieAuthLookup(r *http.Request) (*portainer.ScopedTokenData, error) {
 	// get token from the Authorization header or query parameter
 	token, err := extractKeyFromCookie(r)
 	if err != nil {
@@ -372,6 +427,10 @@ func (bouncer *RequestBouncer) CookieAuthLookup(r *http.Request) (*portainer.Tok
 
 // JWTAuthLookup looks up a valid bearer in the request.
 func (bouncer *RequestBouncer) JWTAuthLookup(r *http.Request) (*portainer.TokenData, error) {
+	return unwrapTokenData(bouncer.jwtAuthLookup(r))
+}
+
+func (bouncer *RequestBouncer) jwtAuthLookup(r *http.Request) (*portainer.ScopedTokenData, error) {
 	// get token from the Authorization header or query parameter
 	token, ok := extractBearerToken(r)
 	if !ok {
@@ -418,7 +477,7 @@ func (bouncer *RequestBouncer) cleanUpExpiredJWTPass() {
 // If the key is valid/verified, the last updated time of the key is updated.
 // Successful verification of the key will return a TokenData object - since the downstream handlers
 // utilise the token injected in the request context.
-func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenData, error) {
+func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.ScopedTokenData, error) {
 	rawAPIKey, ok := extractAPIKey(r)
 	if !ok {
 		return nil, nil
@@ -431,12 +490,15 @@ func (bouncer *RequestBouncer) apiKeyLookup(r *http.Request) (*portainer.TokenDa
 		return nil, ErrInvalidKey
 	}
 
-	tokenData := &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
+	tokenData := &portainer.ScopedTokenData{
+		TokenData: &portainer.TokenData{
+			ID:       user.ID,
+			Username: user.Username,
+			Role:     user.Role,
+		},
+		Scope: portainer.DefaultTokenScope,
 	}
-	if _, _, err := bouncer.jwtService.GenerateToken(tokenData); err != nil {
+	if _, _, err := bouncer.jwtService.GenerateToken(tokenData.TokenData); err != nil {
 		log.Debug().Err(err).Msg("Failed to generate token")
 		return nil, errors.New("failed to generate token")
 	}

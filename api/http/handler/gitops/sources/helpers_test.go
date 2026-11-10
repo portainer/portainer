@@ -47,24 +47,33 @@ func createGitWorkflow(t *testing.T, tx dataservices.DataStoreTx, stack *portain
 
 func newTestHandler(t *testing.T, store dataservices.DataStore) *Handler {
 	t.Helper()
-	return NewHandler(testhelpers.NewTestRequestBouncer(), store, nil, nil, nil)
+	return newTestHandlerWithGit(t, store, nil)
 }
 
-func adminRestrictedContext(userID portainer.UserID) *security.RestrictedRequestContext {
+func newTestHandlerWithGit(t *testing.T, store dataservices.DataStore, gitService portainer.GitService) *Handler {
+	t.Helper()
+	return NewHandler(testhelpers.NewTestRequestBouncer(), store, gitService, nil, nil)
+}
+
+func restrictedContext(userID portainer.UserID, role portainer.UserRole) *security.RestrictedRequestContext {
 	return &security.RestrictedRequestContext{
 		UserID:  userID,
-		IsAdmin: true,
-		User:    &portainer.User{ID: userID, Role: portainer.AdministratorRole},
+		IsAdmin: role == portainer.AdministratorRole,
+		User:    &portainer.User{ID: userID, Role: role},
 	}
 }
 
-// withSecurityContext attaches the admin token data and restricted request
-// context for userID to req, mirroring what the auth middleware sets up in
-// production.
-func withSecurityContext(req *http.Request, userID portainer.UserID) *http.Request {
+// withRoleSecurityContext attaches the token data and restricted request context for
+// userID and role to req, mirroring what the auth middleware sets up in production.
+func withRoleSecurityContext(req *http.Request, userID portainer.UserID, role portainer.UserRole) *http.Request {
 	req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: userID}))
-	req = req.WithContext(security.StoreRestrictedRequestContext(req, adminRestrictedContext(userID)))
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, restrictedContext(userID, role)))
 	return req
+}
+
+// withSecurityContext is withRoleSecurityContext for an admin user
+func withSecurityContext(req *http.Request, userID portainer.UserID) *http.Request {
+	return withRoleSecurityContext(req, userID, portainer.AdministratorRole)
 }
 
 func buildListReq(t *testing.T, userID portainer.UserID, query string) *http.Request {
@@ -150,4 +159,11 @@ func buildDeleteReqWithRawID(t *testing.T, userID portainer.UserID, id string) *
 	t.Helper()
 	req := httptest.NewRequest(http.MethodDelete, "/gitops/sources/"+id, nil)
 	return withSecurityContext(req, userID)
+}
+
+func buildSourceTestConnectionReq(t *testing.T, userID portainer.UserID, role portainer.UserRole, id int, body []byte) *http.Request {
+	t.Helper()
+	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/gitops/sources/%d/test", id), bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	return withRoleSecurityContext(req, userID, role)
 }
