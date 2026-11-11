@@ -33,13 +33,11 @@ func (transport *Transport) authorizeReferencedNetworks(userID portainer.UserID,
 	}
 
 	var access *stackutils.NetworkAccess
-	err := transport.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+	if err := transport.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		access, err = stackutils.LoadNetworkAccess(tx.TeamMembership(), tx.ResourceControl(), transport.endpoint.ID, userID)
-
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		return err
 	}
 

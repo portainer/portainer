@@ -688,13 +688,11 @@ func (transport *Transport) userCanAccessResources(userID portainer.UserID, reso
 	}
 
 	var resourceControls []portainer.ResourceControl
-	err = transport.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+	if err := transport.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
 		var err error
 		resourceControls, err = tx.ResourceControl().ReadAll()
-
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		return false, err
 	}
 

@@ -73,7 +73,7 @@ func (payload *updateSwarmStackPayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int true "Environment identifier"
+// @param endpointId query int false "Environment(endpoint) identifier the stack belongs to. It can only be used by an administrator to bind a legacy stack that has no environment recorded."
 // @param body body updateSwarmStackPayload true "Stack details"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
@@ -87,9 +87,9 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return httperror.BadRequest("Invalid stack identifier route variable", err)
 	}
 
-	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API endpoint
-	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
+	// This is a work-around for stacks created before Portainer version 1.18.0
+	// The EndpointID property is not set on these stacks. The optional EndpointID query parameter
+	// can be used to associate a valid environment(endpoint) identifier to the stack.
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: endpointId", err)
@@ -115,9 +115,16 @@ func (handler *Handler) updateStackInTx(tx dataservices.DataStoreTx, r *http.Req
 		return nil, httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
 	}
 
-	if endpointID != 0 && endpointID != stack.EndpointID {
-		stack.EndpointID = endpointID
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
+
+	resolvedEndpointID, httpErr := resolveStackEndpointID(securityContext, stack, endpointID)
+	if httpErr != nil {
+		return nil, httpErr
+	}
+	stack.EndpointID = resolvedEndpointID
 
 	endpoint, err := tx.Endpoint().Endpoint(stack.EndpointID)
 	if tx.IsErrObjectNotFound(err) {
@@ -130,12 +137,7 @@ func (handler *Handler) updateStackInTx(tx dataservices.DataStoreTx, r *http.Req
 		return nil, httperror.Forbidden("Permission denied to access environment", err)
 	}
 
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return nil, httperror.InternalServerError("Unable to retrieve info from request context", err)
-	}
-
-	//only check resource control when it is a DockerSwarmStack or a DockerComposeStack
+	// only check resource control when it is a DockerSwarmStack or a DockerComposeStack
 	if stack.Type == portainer.DockerSwarmStack || stack.Type == portainer.DockerComposeStack {
 		resourceControl, err := tx.ResourceControl().ResourceControlByResourceIDAndType(stackutils.ResourceControlID(stack.EndpointID, stack.Name), portainer.StackResourceControl)
 		if err != nil {

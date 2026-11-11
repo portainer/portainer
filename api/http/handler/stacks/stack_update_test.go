@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
 	"github.com/portainer/portainer/api/stacks/deployments"
 	"github.com/portainer/portainer/api/stacks/stackutils"
@@ -130,9 +131,13 @@ func Test_updateStackInTx(t *testing.T) {
 		}
 		setup := setupUpdateStackInTxTest(t, stack, payload)
 
+		const missingEndpointID = portainer.EndpointID(2999)
+		stack.EndpointID = missingEndpointID
+		require.NoError(t, setup.store.Stack().Update(stack.ID, stack))
+
 		var handlerErr *httperror.HandlerError
 		_ = setup.store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, 2999) // Non-existent endpoint ID
+			_, handlerErr = setup.handler.updateStackInTx(tx, setup.req, stack.ID, missingEndpointID)
 			return nil
 		})
 
@@ -416,4 +421,77 @@ func (testStackDeployer) DeployRemoteComposeStack(stack *portainer.Stack, endpoi
 
 func (testStackDeployer) DeployRemoteSwarmStack(stack *portainer.Stack, endpoint *portainer.Endpoint, registries []portainer.Registry, prune, pullImage bool) error {
 	return nil
+}
+
+func TestStackUpdate_RejectsRebindingToAnotherEnvironment(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	standardUser := &portainer.User{ID: 2, Username: "standard", Role: portainer.StandardUserRole}
+	require.NoError(t, store.User().Create(standardUser))
+
+	allowedEndpoint, err := mockCreateEndpoint(store)
+	require.NoError(t, err)
+
+	victimEndpoint := &portainer.Endpoint{ID: 2, Name: "victim", SecuritySettings: allowedEndpoint.SecuritySettings}
+	require.NoError(t, store.Endpoint().Create(victimEndpoint))
+
+	victimStack := &portainer.Stack{
+		ID:         1,
+		Name:       "shared-name",
+		EntryPoint: "docker-compose.yml",
+		EndpointID: victimEndpoint.ID,
+		Type:       portainer.DockerComposeStack,
+	}
+	require.NoError(t, store.Stack().Create(victimStack))
+	require.NoError(t, store.ResourceControl().Create(&portainer.ResourceControl{
+		ID:                 1,
+		ResourceID:         stackutils.ResourceControlID(victimEndpoint.ID, victimStack.Name),
+		Type:               portainer.StackResourceControl,
+		AdministratorsOnly: true,
+	}))
+
+	shadowStack := &portainer.Stack{
+		ID:         2,
+		Name:       victimStack.Name,
+		EntryPoint: "docker-compose.yml",
+		EndpointID: allowedEndpoint.ID,
+		Type:       portainer.DockerComposeStack,
+	}
+	require.NoError(t, store.Stack().Create(shadowStack))
+	require.NoError(t, store.ResourceControl().Create(&portainer.ResourceControl{
+		ID:           2,
+		ResourceID:   stackutils.ResourceControlID(allowedEndpoint.ID, shadowStack.Name),
+		Type:         portainer.StackResourceControl,
+		UserAccesses: []portainer.UserResourceAccess{{UserID: standardUser.ID, AccessLevel: portainer.ReadWriteAccessLevel}},
+	}))
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer())
+	handler.DataStore = store
+	handler.StackDeployer = testStackDeployer{}
+	handler.ComposeStackManager = testhelpers.NewComposeStackManager()
+
+	jsonPayload, err := json.Marshal(&updateComposeStackPayload{
+		StackFileContent: "version: '3'\nservices:\n  web:\n    image: nginx:latest",
+	})
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(
+		http.MethodPut,
+		fmt.Sprintf("/stacks/%d?endpointId=%d", victimStack.ID, allowedEndpoint.ID),
+		bytes.NewBuffer(jsonPayload),
+	)
+	req = req.WithContext(security.StoreRestrictedRequestContext(req, &security.RestrictedRequestContext{
+		UserID: standardUser.ID,
+	}))
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusForbidden, rec.Code, rec.Body.String())
+
+	stored, err := store.Stack().Read(victimStack.ID)
+	require.NoError(t, err)
+	require.Equal(t, victimEndpoint.ID, stored.EndpointID, "stack must stay on its own environment")
+	require.Zero(t, stored.UpdateDate)
 }

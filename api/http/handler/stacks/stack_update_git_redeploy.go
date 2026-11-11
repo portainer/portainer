@@ -50,7 +50,7 @@ func (payload *stackGitRedployPayload) Validate(r *http.Request) error {
 // @accept json
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
+// @param endpointId query int false "Environment(Endpoint) identifier the stack belongs to. It can only be used by an administrator to bind a legacy stack that has no environment recorded."
 // @param body body stackGitRedployPayload true "Git configs for pull and redeploy of a stack. **StackName** may only be populated for Kuberenetes stacks, and if specified with a blank string, it will be set to blank"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
@@ -71,19 +71,27 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 		return httperror.InternalServerError("Unable to find a stack with the specified identifier inside the database", err)
 	}
 
-	if stack.GitConfig == nil {
-		return httperror.BadRequest("Stack is not created from git", err)
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
-	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API environment(endpoint)
-	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
+	// This is a work-around for stacks created before Portainer version 1.18.0
+	// The EndpointID property is not set on these stacks. The optional EndpointID query parameter
+	// can be used to associate a valid environment(endpoint) identifier to the stack.
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: endpointId", err)
 	}
-	if endpointID != int(stack.EndpointID) {
-		stack.EndpointID = portainer.EndpointID(endpointID)
+
+	resolvedEndpointID, httpErr := resolveStackEndpointID(securityContext, stack, portainer.EndpointID(endpointID))
+	if httpErr != nil {
+		return httpErr
+	}
+	stack.EndpointID = resolvedEndpointID
+
+	if stack.GitConfig == nil {
+		return httperror.BadRequest("Stack is not created from git", err)
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
@@ -95,11 +103,6 @@ func (handler *Handler) stackGitRedeploy(w http.ResponseWriter, r *http.Request)
 
 	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint); err != nil {
 		return httperror.Forbidden("Permission denied to access environment", err)
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve info from request context", err)
 	}
 
 	// Only check resource control when it is a DockerSwarmStack or a DockerComposeStack
