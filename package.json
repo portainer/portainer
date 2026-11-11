@@ -13,7 +13,7 @@
   "licenses": [
     {
       "type": "Zlib",
-      "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
+      "url": "https://raw.githubusercontent.com/portainer/portainer/HEAD/LICENSE"
     }
   ],
   "scripts": {

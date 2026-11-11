@@ -5,7 +5,7 @@ import { FormSection } from '@@/form-components/FormSection';
 import { Input } from '@@/form-components/Input';
 import { useDocsUrl } from '@@/PageHeader/ContextHelp';
 
-// this value is taken from https://github.com/portainer/portainer/blob/develop/api/portainer.go#L1628
+// this value is taken from https://github.com/portainer/portainer/blob/HEAD/api/portainer.go#L1628
 const DEFAULT_URL =
   'https://raw.githubusercontent.com/portainer/templates/v3/templates.json';
 
