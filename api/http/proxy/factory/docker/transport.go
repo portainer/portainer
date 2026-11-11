@@ -687,7 +687,13 @@ func (transport *Transport) userCanAccessResources(userID portainer.UserID, reso
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
 
-	resourceControls, err := transport.dataStore.ResourceControl().ReadAll()
+	var resourceControls []portainer.ResourceControl
+	err = transport.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		resourceControls, err = tx.ResourceControl().ReadAll()
+
+		return err
+	})
 	if err != nil {
 		return false, err
 	}

@@ -8,6 +8,7 @@ import (
 	"slices"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 
 	"github.com/docker/docker/api/types/network"
 
@@ -31,7 +32,13 @@ func (transport *Transport) authorizeReferencedNetworks(userID portainer.UserID,
 		return nil
 	}
 
-	access, err := stackutils.LoadNetworkAccess(transport.dataStore.TeamMembership(), transport.dataStore.ResourceControl(), transport.endpoint.ID, userID)
+	var access *stackutils.NetworkAccess
+	err := transport.dataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		access, err = stackutils.LoadNetworkAccess(tx.TeamMembership(), tx.ResourceControl(), transport.endpoint.ID, userID)
+
+		return err
+	})
 	if err != nil {
 		return err
 	}
