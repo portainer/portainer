@@ -101,6 +101,7 @@ func (f *volumeCreationFixtures) newTransport() *Transport {
 		endpoint:      &portainer.Endpoint{ID: f.endpointID},
 		dataStore:     f.ds,
 		HTTPTransport: &http.Transport{},
+		dockerID:      "test-docker-id",
 	}
 }
 
@@ -169,9 +170,10 @@ func TestDecorateVolumeResourceCreationOperation_BindDriverOptAllowedForAdmin(t 
 	}
 
 	resp, err := f.newTransport().decorateVolumeResourceCreationOperation(f.newRequest(t, body, f.adminUser), portainer.VolumeResourceControl)
-	require.NotErrorIs(t, err, ErrBindMountsForbidden)
+	require.NoError(t, err)
 	require.NotNil(t, resp)
-	require.NotEqual(t, http.StatusForbidden, resp.StatusCode)
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
+	require.Equal(t, "test-volume", resp.Header.Get("Location"))
 	err = resp.Body.Close()
 	require.NoError(t, err)
 }
@@ -194,9 +196,10 @@ func TestDecorateVolumeResourceCreationOperation_BindDriverOptAllowedWhenSetting
 	}
 
 	resp, err := f.newTransport().decorateVolumeResourceCreationOperation(f.newRequest(t, body, f.stdUser), portainer.VolumeResourceControl)
-	require.NotErrorIs(t, err, ErrBindMountsForbidden)
+	require.NoError(t, err)
 	require.NotNil(t, resp)
-	require.NotEqual(t, http.StatusForbidden, resp.StatusCode)
+	require.Equal(t, http.StatusCreated, resp.StatusCode)
+	require.Equal(t, "test-volume", resp.Header.Get("Location"))
 	err = resp.Body.Close()
 	require.NoError(t, err)
 }
