@@ -299,6 +299,7 @@ func (server *Server) Start() error {
 	websocketHandler.SignatureService = server.SignatureService
 	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
 	websocketHandler.KubernetesClientFactory = server.KubernetesClientFactory
+	websocketHandler.DockerClientFactory = server.DockerClientFactory
 
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
 	webhookHandler.DataStore = server.DataStore

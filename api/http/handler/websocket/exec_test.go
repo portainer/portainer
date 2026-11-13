@@ -32,3 +32,42 @@ func TestWebsocketExec_deniesUnauthorizedEndpoint(t *testing.T) {
 	require.NotNil(t, handlerErr, "expected an authorization error for a denied environment")
 	assert.Equal(t, http.StatusForbidden, handlerErr.StatusCode)
 }
+
+func TestWebsocketExec_containerResourceControl(t *testing.T) {
+	t.Parallel()
+
+	fx := newDockerAccessFixture(t)
+
+	// A request that passes authorization reaches the websocket upgrade, which fails on a plain
+	// recorder, so the upgrade failure message means allowed
+	f := func(user portainer.User, id string, expectedStatus int, expectedMessage string) {
+		t.Helper()
+
+		req := httptest.NewRequest(http.MethodGet, "/websocket/exec?id="+id+"&endpointId=3", nil)
+		req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: user.ID, Role: user.Role}))
+
+		handlerErr := fx.handler.websocketExec(httptest.NewRecorder(), req)
+		require.NotNil(t, handlerErr)
+		require.Equal(t, expectedStatus, handlerErr.StatusCode)
+		require.Equal(t, expectedMessage, handlerErr.Message)
+	}
+
+	// admin can start any exec instance
+	f(fx.admin, ownedExecID, http.StatusInternalServerError, execUpgradeFailedMessage)
+	f(fx.admin, unmanagedExecID, http.StatusInternalServerError, execUpgradeFailedMessage)
+
+	// owner can start an exec instance of its own container
+	f(fx.owner, ownedExecID, http.StatusInternalServerError, execUpgradeFailedMessage)
+
+	// another user cannot start an exec instance of the owner's container
+	f(fx.other, ownedExecID, http.StatusForbidden, containerDeniedMessage)
+
+	// non-admin cannot start an exec instance of a container without a resource control
+	f(fx.owner, unmanagedExecID, http.StatusForbidden, containerDeniedMessage)
+
+	// unknown exec instance is denied without exposing the Docker error
+	f(fx.owner, "0123", http.StatusForbidden, containerDeniedMessage)
+
+	// a Docker failure is reported as a server error
+	f(fx.owner, "dead", http.StatusInternalServerError, verifyAccessFailedMessage)
+}
