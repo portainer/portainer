@@ -168,5 +168,9 @@ export function Terminal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connect, url]);
 
-  return <div ref={terminalRef} className="h-full" />;
+  return (
+    <div className="min-h-96 relative h-full">
+      <div ref={terminalRef} className="absolute inset-0 overflow-hidden" />
+    </div>
+  );
 }
