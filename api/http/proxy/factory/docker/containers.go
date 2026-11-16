@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"io"
-	"maps"
 	"net/http"
 	"slices"
 	"strings"
@@ -44,6 +43,19 @@ type PartialMount struct {
 			Options map[string]string `json:"Options"`
 		} `json:"DriverConfig"`
 	} `json:"VolumeOptions"`
+}
+
+type PartialEndpointSettings struct {
+	NetworkID string `json:"NetworkID"`
+}
+
+func ReferencedContainerNetworkNames(networkMode string, endpointsConfig map[string]PartialEndpointSettings) []string {
+	candidates := []string{networkMode}
+	for name, settings := range endpointsConfig {
+		candidates = append(candidates, name, settings.NetworkID)
+	}
+
+	return stackutils.ReferencedNetworkNames(candidates)
 }
 
 func referencedVolumeNames(binds []string, mounts []PartialMount) []string {
@@ -271,7 +283,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			NetworkMode string         `json:"NetworkMode"`
 		} `json:"HostConfig"`
 		NetworkingConfig struct {
-			EndpointsConfig map[string]json.RawMessage `json:"EndpointsConfig"`
+			EndpointsConfig map[string]PartialEndpointSettings `json:"EndpointsConfig"`
 		} `json:"NetworkingConfig"`
 	}
 
@@ -342,7 +354,7 @@ func (transport *Transport) decorateContainerCreationOperation(request *http.Req
 			}
 		}
 
-		networkNames := stackutils.ReferencedNetworkNames(slices.AppendSeq([]string{partialContainer.HostConfig.NetworkMode}, maps.Keys(partialContainer.NetworkingConfig.EndpointsConfig)))
+		networkNames := ReferencedContainerNetworkNames(partialContainer.HostConfig.NetworkMode, partialContainer.NetworkingConfig.EndpointsConfig)
 		if err := transport.authorizeReferencedNetworks(tokenData.ID, networkNames, getClient); err != nil {
 			if errors.Is(err, ErrNetworkAccessForbidden) {
 				return forbiddenResponse, err

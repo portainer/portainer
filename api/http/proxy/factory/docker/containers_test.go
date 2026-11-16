@@ -406,4 +406,55 @@ func TestDecorateContainerCreationOperation_NetworkResourceControl(t *testing.T)
 			"EndpointsConfig": map[string]any{"ownernet": map[string]any{}},
 		},
 	}, nil, true)
+
+	ownedAndForeign := RoutesDefinition{}
+	maps.Copy(ownedAndForeign, networkRoutes("mynet", "mynetid"))
+	maps.Copy(ownedAndForeign, networkRoutes("ownernet", "ownernetid"))
+	maps.Copy(ownedAndForeign, networkRoutes("bridge", "bridgeid"))
+
+	ownMynet := func(t *testing.T, fx *containerCreationFixtures) {
+		t.Helper()
+
+		err := fx.ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+			if err := tx.ResourceControl().Create(authorization.NewPrivateResourceControl("mynetid", portainer.NetworkResourceControl, fx.stdUser.ID)); err != nil {
+				return err
+			}
+
+			return tx.ResourceControl().Create(authorization.NewPrivateResourceControl("ownernetid", portainer.NetworkResourceControl, fx.adminUser.ID))
+		})
+		require.NoError(t, err)
+	}
+
+	endpointsConfig := func(key string, settings any) map[string]any {
+		return map[string]any{
+			"HostConfig": map[string]any{"NetworkMode": key},
+			"NetworkingConfig": map[string]any{
+				"EndpointsConfig": map[string]any{key: settings},
+			},
+		}
+	}
+
+	// an owned network keyed with its own NetworkID is allowed
+	f(ownedAndForeign, endpointsConfig("mynet", map[string]any{"NetworkID": "mynetid"}), ownMynet, false)
+
+	// an owned network with a null or empty endpoint config is allowed
+	f(ownedAndForeign, endpointsConfig("mynet", nil), ownMynet, false)
+	f(ownedAndForeign, endpointsConfig("mynet", map[string]any{}), ownMynet, false)
+
+	// a NetworkID naming a built-in network is allowed
+	f(ownedAndForeign, endpointsConfig("mynet", map[string]any{"NetworkID": "bridgeid"}), ownMynet, false)
+
+	// the daemon joins a user-defined key's NetworkID instead of the key, so another user's network ID is forbidden
+	f(ownedAndForeign, endpointsConfig("mynet", map[string]any{"NetworkID": "ownernetid"}), ownMynet, true)
+
+	// another user's network referenced by name in NetworkID is forbidden too
+	f(ownedAndForeign, endpointsConfig("mynet", map[string]any{"NetworkID": "ownernet"}), ownMynet, true)
+
+	// a lowercase key, which the daemon also accepts, is forbidden too
+	f(ownedAndForeign, endpointsConfig("mynet", map[string]any{"networkid": "ownernetid"}), ownMynet, true)
+
+	// keys skipped by the name check are still user-defined to the daemon, so their NetworkID is authorized
+	f(ownedAndForeign, endpointsConfig("ingress", map[string]any{"NetworkID": "ownernetid"}), ownMynet, true)
+	f(ownedAndForeign, endpointsConfig("nat", map[string]any{"NetworkID": "ownernetid"}), ownMynet, true)
+	f(ownedAndForeign, endpointsConfig("service:x", map[string]any{"NetworkID": "ownernetid"}), ownMynet, true)
 }
