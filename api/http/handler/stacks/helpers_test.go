@@ -144,10 +144,18 @@ func setupKubernetesStackAccess(t *testing.T, restrictDefaultNamespace bool) *Ha
 		require.NoError(t, store.User().Create(&users[i]))
 	}
 
+	group := &portainer.EndpointGroup{Name: "Unassigned"}
+	require.NoError(t, store.EndpointGroup().Create(group))
+
 	endpoint := &portainer.Endpoint{
-		ID:   k8sAccessEndpointID,
-		Name: "kubernetes",
-		Type: portainer.KubernetesLocalEnvironment,
+		ID:      k8sAccessEndpointID,
+		Name:    "kubernetes",
+		Type:    portainer.KubernetesLocalEnvironment,
+		GroupID: group.ID,
+		UserAccessPolicies: portainer.UserAccessPolicies{
+			k8sAccessStandardUserID: {},
+			k8sAccessLegacyUserID:   {},
+		},
 	}
 	endpoint.Kubernetes.Configuration.RestrictDefaultNamespace = restrictDefaultNamespace
 	require.NoError(t, store.Endpoint().Create(endpoint))

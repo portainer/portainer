@@ -2,14 +2,17 @@ package workflows
 
 import (
 	"errors"
+	"os"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/kubernetes/cli"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 
 	kfake "k8s.io/client-go/kubernetes/fake"
 
@@ -110,6 +113,47 @@ func TestFilterDockerStacksByAccess_KubeStacksPassThrough(t *testing.T) {
 	require.Equal(t, "kube-stack", result[0].Name)
 }
 
+func TestFilterDockerStacksByAccess_ExcludesStacksOnInaccessibleEnvironments(t *testing.T) {
+	t.Parallel()
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	const (
+		userID            portainer.UserID     = 1
+		accessibleEnvID   portainer.EndpointID = 1
+		inaccessibleEnvID portainer.EndpointID = 2
+	)
+
+	group := &portainer.EndpointGroup{Name: "Unassigned"}
+	require.NoError(t, store.EndpointGroup().Create(group))
+	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{
+		ID:                 accessibleEnvID,
+		Type:               portainer.DockerEnvironment,
+		GroupID:            group.ID,
+		UserAccessPolicies: portainer.UserAccessPolicies{userID: {}},
+	}))
+	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{ID: inaccessibleEnvID, Type: portainer.DockerEnvironment, GroupID: group.ID}))
+
+	stacks := []portainer.Stack{
+		{ID: 1, Name: "accessible", EndpointID: accessibleEnvID, Type: portainer.DockerComposeStack},
+		{ID: 2, Name: "inaccessible", EndpointID: inaccessibleEnvID, Type: portainer.DockerComposeStack},
+	}
+	for _, s := range stacks {
+		require.NoError(t, store.ResourceControl().Create(authorization.NewPublicResourceControl(stackutils.ResourceControlID(s.EndpointID, s.Name), portainer.StackResourceControl)))
+	}
+
+	sc := &security.RestrictedRequestContext{UserID: userID}
+
+	var result []portainer.Stack
+	err := store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var txErr error
+		result, txErr = FilterDockerStacksByAccess(tx, stacks, sc)
+		return txErr
+	})
+	require.NoError(t, err)
+	require.Len(t, result, 1)
+	require.Equal(t, "accessible", result[0].Name)
+}
+
 func TestFilterDockerStacksByAccess_AdminGetsAll(t *testing.T) {
 	t.Parallel()
 
@@ -141,10 +185,47 @@ func TestBuildEndpointAccessMap_AdminIsKubeAdmin(t *testing.T) {
 		2: {ID: 2, Type: portainer.DockerEnvironment},
 	}
 
-	result, err := buildEndpointAccessMap(nil, sc, endpointMap)
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var result map[portainer.EndpointID]endpointAccess
+	err := store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var txErr error
+		result, txErr = buildEndpointAccessMap(tx, nil, sc, endpointMap)
+
+		return txErr
+	})
 	require.NoError(t, err)
 	require.Len(t, result, 1)
 	require.True(t, result[1].IsKubeAdmin)
+	require.Empty(t, result[1].NonAdminNamespaces)
+}
+
+func TestBuildEndpointAccessMap_MissingGroupGetsNoAccess(t *testing.T) {
+	t.Parallel()
+
+	sc := &security.RestrictedRequestContext{UserID: 1}
+
+	endpointMap := map[portainer.EndpointID]portainer.Endpoint{
+		1: {
+			ID:                 1,
+			Type:               portainer.KubernetesLocalEnvironment,
+			GroupID:            99,
+			UserAccessPolicies: portainer.UserAccessPolicies{1: {}},
+		},
+	}
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	var result map[portainer.EndpointID]endpointAccess
+	err := store.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var txErr error
+		result, txErr = buildEndpointAccessMap(tx, nil, sc, endpointMap)
+
+		return txErr
+	})
+	require.NoError(t, err)
+	require.Contains(t, result, portainer.EndpointID(1))
+	require.False(t, result[1].IsKubeAdmin)
 	require.Empty(t, result[1].NonAdminNamespaces)
 }
 
@@ -178,82 +259,135 @@ func TestFilterK8SStacks_DockerStacksPassThrough(t *testing.T) {
 	assert.Equal(t, "docker-stack", result[0].Name)
 }
 
-func TestFilterK8SStacks_NonAdminWithNamespaceAccess(t *testing.T) {
+func TestFilterK8SStacks_NonAdminNamespaces(t *testing.T) {
 	t.Parallel()
 
-	stacks := []portainer.Stack{
-		{ID: 1, Name: "stack-name", EndpointID: 1, Namespace: "ns1", Type: portainer.KubernetesStack},
-	}
+	const configMap = "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: cm\n"
 
-	accessMap := map[portainer.EndpointID]endpointAccess{
-		1: {IsKubeAdmin: false, NonAdminNamespaces: []string{"ns1"}},
-	}
-
-	result := filterK8SStacks(stacks, accessMap)
-	require.Len(t, result, 1)
-	assert.Equal(t, "stack-name", result[0].Name)
-}
-
-func TestResolveKubeAccess_NonAdminWithTeamMemberships(t *testing.T) {
-	t.Parallel()
-
-	fakeKubeClient := kfake.NewSimpleClientset()
-	kcl := cli.NewTestKubeClient(fakeKubeClient)
-	factory := cli.NewTestClientFactory(1, kcl)
-
-	ep := &portainer.Endpoint{
-		ID:   1,
-		Type: portainer.KubernetesLocalEnvironment,
-	}
-
-	sc := &security.RestrictedRequestContext{
-		IsAdmin: false,
-		UserID:  1,
-		UserMemberships: []portainer.TeamMembership{
-			{TeamID: 5},
+	for _, tc := range []struct {
+		name            string
+		namespace       string
+		manifest        string
+		expectedVisible bool
+	}{
+		{
+			name:            "stack namespace not granted",
+			namespace:       "not-accessible",
+			manifest:        configMap,
+			expectedVisible: false,
 		},
-	}
+		{
+			name:            "manifest namespace not granted",
+			manifest:        configMap + "  namespace: not-accessible\n",
+			expectedVisible: false,
+		},
+		{
+			name:            "stack namespace granted",
+			namespace:       "accessible",
+			manifest:        configMap,
+			expectedVisible: true,
+		},
+		{
+			name:            "manifest namespace granted",
+			manifest:        configMap + "  namespace: accessible\n",
+			expectedVisible: true,
+		},
+		{
+			name:            "stack and manifest namespaces conflict",
+			namespace:       "accessible",
+			manifest:        configMap + "  namespace: not-accessible\n",
+			expectedVisible: false,
+		},
+		{
+			name:            "no namespace resolves to default",
+			manifest:        configMap,
+			expectedVisible: false,
+		},
+		{
+			name:            "namespace object counts as its name",
+			manifest:        "apiVersion: v1\nkind: Namespace\nmetadata:\n  name: accessible\n",
+			expectedVisible: true,
+		},
+		{
+			name:            "cluster-scoped object is admin only",
+			manifest:        "apiVersion: rbac.authorization.k8s.io/v1\nkind: ClusterRole\nmetadata:\n  name: cr\n",
+			expectedVisible: false,
+		},
+		{
+			name:            "empty manifest and not stack namespace",
+			expectedVisible: false,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	access, err := ResolveKubeAccess(factory, sc, ep)
-	require.NoError(t, err)
-	require.False(t, access.IsKubeAdmin)
-	require.Equal(t, []string{"default"}, access.NonAdminNamespaces)
+			projectPath := t.TempDir()
+			if tc.manifest != "" {
+				require.NoError(t, os.WriteFile(filesystem.JoinPaths(projectPath, "stack.yaml"), []byte(tc.manifest), 0o600))
+			}
+
+			stacks := []portainer.Stack{{
+				ID:          1,
+				EndpointID:  1,
+				Namespace:   tc.namespace,
+				Type:        portainer.KubernetesStack,
+				ProjectPath: projectPath,
+				EntryPoint:  "stack.yaml",
+			}}
+
+			accessMap := map[portainer.EndpointID]endpointAccess{
+				1: {NonAdminNamespaces: []string{"accessible"}},
+			}
+
+			gotVisible := len(filterK8SStacks(stacks, accessMap)) > 0
+
+			assert.Equal(t, tc.expectedVisible, gotVisible)
+		})
+	}
 }
 
 func TestResolveKubeAccess_NonAdmin(t *testing.T) {
 	t.Parallel()
 
-	fakeKubeClient := kfake.NewSimpleClientset()
-	kcl := cli.NewTestKubeClient(fakeKubeClient)
-	factory := cli.NewTestClientFactory(1, kcl)
+	for _, tc := range []struct {
+		name               string
+		userAccess         portainer.UserAccessPolicies
+		teamAccess         portainer.TeamAccessPolicies
+		missingGroup       bool
+		expectedNamespaces []string
+	}{
+		{name: "with user access", userAccess: portainer.UserAccessPolicies{1: {}}, expectedNamespaces: []string{"default"}},
+		{name: "with team access", teamAccess: portainer.TeamAccessPolicies{5: {}}, expectedNamespaces: []string{"default"}},
+		{name: "without environment access"},
+		{name: "with user access but missing group", userAccess: portainer.UserAccessPolicies{1: {}}, missingGroup: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	ep := &portainer.Endpoint{
-		ID:   1,
-		Type: portainer.KubernetesLocalEnvironment,
+			var group *portainer.EndpointGroup
+			if !tc.missingGroup {
+				group = &portainer.EndpointGroup{ID: 1, Name: "Unassigned"}
+			}
+
+			ep := &portainer.Endpoint{
+				ID:                 1,
+				Type:               portainer.KubernetesLocalEnvironment,
+				GroupID:            1,
+				UserAccessPolicies: tc.userAccess,
+				TeamAccessPolicies: tc.teamAccess,
+			}
+
+			factory := cli.NewTestClientFactory(1, cli.NewTestKubeClient(kfake.NewSimpleClientset()))
+
+			sc := &security.RestrictedRequestContext{
+				UserID:          1,
+				UserMemberships: []portainer.TeamMembership{{UserID: 1, TeamID: 5}},
+			}
+
+			access, err := ResolveKubeAccess(factory, sc, ep, group)
+			require.NoError(t, err)
+			require.False(t, access.IsKubeAdmin)
+			require.Equal(t, tc.expectedNamespaces, access.NonAdminNamespaces)
+		})
 	}
-
-	sc := &security.RestrictedRequestContext{
-		IsAdmin: false,
-		UserID:  1,
-	}
-
-	access, err := ResolveKubeAccess(factory, sc, ep)
-	require.NoError(t, err)
-	require.False(t, access.IsKubeAdmin)
-	require.Equal(t, []string{"default"}, access.NonAdminNamespaces)
-}
-
-func TestFilterK8SStacks_NonAdminWithoutNamespaceAccess(t *testing.T) {
-	t.Parallel()
-
-	stacks := []portainer.Stack{
-		{ID: 1, Name: "stack-name", EndpointID: 1, Namespace: "ns1", Type: portainer.KubernetesStack},
-	}
-
-	accessMap := map[portainer.EndpointID]endpointAccess{
-		1: {IsKubeAdmin: false, NonAdminNamespaces: []string{}},
-	}
-
-	result := filterK8SStacks(stacks, accessMap)
-	require.Empty(t, result)
 }

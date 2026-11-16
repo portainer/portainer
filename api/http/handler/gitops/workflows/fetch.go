@@ -3,7 +3,6 @@ package workflows
 import (
 	"errors"
 	"fmt"
-	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -161,13 +160,13 @@ func checkStackAccessible(
 		return ErrResourceNotAccessible
 	}
 
-	access, err := svc.ResolveKubeAccess(k8sFactory, sc, &ep)
+	allowed, err := svc.AuthorizeKubeStackRead(tx, k8sFactory, sc, &ep, &stack)
 	if err != nil {
-		log.Warn().Err(err).Str("context", "checkStackAccessible").Int("endpoint_id", int(ep.ID)).Msg("Failed to resolve kube access for endpoint, filtering artifact")
+		log.Warn().Err(err).Str("context", "checkStackAccessible").Int("stack_id", int(stack.ID)).Msg("Failed to resolve kube access for stack, filtering artifact")
 		return ErrResourceNotAccessible
 	}
 
-	if (!access.IsKubeAdmin && !slices.Contains(access.NonAdminNamespaces, stack.Namespace)) || !svc.HasAccessibleSource(artifact.Files, sourceMap) {
+	if !allowed || !svc.HasAccessibleSource(artifact.Files, sourceMap) {
 		return ErrResourceNotAccessible
 	}
 

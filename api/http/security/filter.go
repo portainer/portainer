@@ -90,12 +90,7 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 
 	n := 0
 	for _, endpoint := range endpoints {
-		endpointGroup := getAssociatedGroup(&endpoint, groups)
-		if endpointGroup == nil {
-			continue
-		}
-
-		if AuthorizedEndpointAccess(&endpoint, endpointGroup, context.UserID, context.UserMemberships) {
+		if canAccessEndpoint(&endpoint, groups, context) {
 			endpoint.UserAccessPolicies = nil
 			endpoints[n] = endpoint
 			n++
@@ -103,6 +98,31 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 	}
 
 	return endpoints[:n]
+}
+
+// AccessibleEndpointIDs returns the IDs of the environments(endpoints)
+// the user can access (can be inherited via endpoint groups).
+func AccessibleEndpointIDs(
+	endpoints []portainer.Endpoint,
+	groups []portainer.EndpointGroup,
+	context *RestrictedRequestContext,
+) set.Set[portainer.EndpointID] {
+	ids := make(set.Set[portainer.EndpointID])
+	for i := range endpoints {
+		if context.IsAdmin || canAccessEndpoint(&endpoints[i], groups, context) {
+			ids.Add(endpoints[i].ID)
+		}
+	}
+
+	return ids
+}
+
+// canAccessEndpoint reports whether the user can access the environment(endpoint), directly
+// or through its group. An environment without a group is not accessible
+func canAccessEndpoint(endpoint *portainer.Endpoint, groups []portainer.EndpointGroup, context *RestrictedRequestContext) bool {
+	group := getAssociatedGroup(endpoint, groups)
+
+	return group != nil && AuthorizedEndpointAccess(endpoint, group, context.UserID, context.UserMemberships)
 }
 
 // FilterEndpointGroups filters environment(endpoint) groups based on user role and team memberships.

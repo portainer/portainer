@@ -76,9 +76,15 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 			return httperror.InternalServerError("Unable to retrieve user information from the database", err)
 		}
 
+		endpointGroups, err := handler.DataStore.EndpointGroup().ReadAll()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environment groups from the database", err)
+		}
+
+		accessibleEndpointIDs := security.AccessibleEndpointIDs(endpoints, endpointGroups, securityContext)
 		userTeamIDs := authorization.TeamIDs(securityContext.UserMemberships)
 
-		stacks = authorization.FilterAuthorizedStacks(stacks, user.ID, userTeamIDs)
+		stacks = authorization.FilterAuthorizedStacks(stacks, user.ID, userTeamIDs, accessibleEndpointIDs)
 	}
 
 	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {

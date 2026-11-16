@@ -114,9 +114,18 @@ func TestFetchWorkflowByID_EdgeStackArtifactFilteredForNonAdmin_SiblingStackSurv
 		require.NoError(t, tx.Workflow().Create(wf))
 		wfID = wf.ID
 
-		require.NoError(t, tx.Stack().Create(&portainer.Stack{ID: 1, Name: "docker-stack", WorkflowID: wf.ID}))
+		group := &portainer.EndpointGroup{Name: "Unassigned"}
+		require.NoError(t, tx.EndpointGroup().Create(group))
+		require.NoError(t, tx.Endpoint().Create(&portainer.Endpoint{
+			ID:                 1,
+			Type:               portainer.DockerEnvironment,
+			GroupID:            group.ID,
+			UserAccessPolicies: portainer.UserAccessPolicies{2: {}},
+		}))
+
+		require.NoError(t, tx.Stack().Create(&portainer.Stack{ID: 1, Name: "docker-stack", EndpointID: 1, WorkflowID: wf.ID}))
 		require.NoError(t, tx.ResourceControl().Create(&portainer.ResourceControl{
-			ResourceID: stackutils.ResourceControlID(0, "docker-stack"),
+			ResourceID: stackutils.ResourceControlID(1, "docker-stack"),
 			Type:       portainer.StackResourceControl,
 			Public:     true,
 		}))

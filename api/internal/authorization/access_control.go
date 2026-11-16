@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/portainer/portainer/pkg/authorization"
 )
@@ -49,11 +50,22 @@ func DecorateCustomTemplates(templates []portainer.CustomTemplate, resourceContr
 	return templates
 }
 
-// FilterAuthorizedStacks returns a list of decorated stacks filtered through resource control access checks.
-func FilterAuthorizedStacks(stacks []portainer.Stack, userID portainer.UserID, userTeamIDs []portainer.TeamID) []portainer.Stack {
+// FilterAuthorizedStacks returns a list of decorated stacks
+// filtered through environment and resource control access checks.
+// Stacks on an environment missing from accessibleEndpointIDs are excluded.
+func FilterAuthorizedStacks(
+	stacks []portainer.Stack,
+	userID portainer.UserID,
+	userTeamIDs []portainer.TeamID,
+	accessibleEndpointIDs set.Set[portainer.EndpointID],
+) []portainer.Stack {
 	authorizedStacks := make([]portainer.Stack, 0)
 
 	for _, stack := range stacks {
+		if !accessibleEndpointIDs.Contains(stack.EndpointID) {
+			continue
+		}
+
 		if stack.ResourceControl != nil && UserCanAccessResource(userID, userTeamIDs, stack.ResourceControl) {
 			authorizedStacks = append(authorizedStacks, stack)
 		}

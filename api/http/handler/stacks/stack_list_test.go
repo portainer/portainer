@@ -1,12 +1,94 @@
 package stacks
 
 import (
+	"encoding/json"
+	"net/http"
 	"sort"
 	"testing"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/datastore"
+	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/testhelpers"
+	"github.com/portainer/portainer/api/stacks/stackutils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestStackList_ExcludesStacksOnInaccessibleEnvironments(t *testing.T) {
+	t.Parallel()
+
+	const (
+		userID            portainer.UserID     = 2
+		accessibleEnvID   portainer.EndpointID = 1
+		inaccessibleEnvID portainer.EndpointID = 2
+		accessibleStackID portainer.StackID    = 1
+		publicStackID     portainer.StackID    = 2
+		userOwnedStackID  portainer.StackID    = 3
+	)
+
+	_, store := datastore.MustNewTestStore(t, false, true)
+
+	// user IDs are assigned sequentially, and serveAsUser treats ID 1 as the admin
+	require.NoError(t, store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole}))
+	user := &portainer.User{Username: "standard", Role: portainer.StandardUserRole}
+	require.NoError(t, store.User().Create(user))
+	require.Equal(t, userID, user.ID)
+
+	group := &portainer.EndpointGroup{Name: "Unassigned"}
+	require.NoError(t, store.EndpointGroup().Create(group))
+
+	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{
+		ID:                 accessibleEnvID,
+		Name:               "accessible",
+		Type:               portainer.DockerEnvironment,
+		GroupID:            group.ID,
+		UserAccessPolicies: portainer.UserAccessPolicies{userID: {}},
+	}))
+	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{
+		ID:      inaccessibleEnvID,
+		Name:    "inaccessible",
+		Type:    portainer.DockerEnvironment,
+		GroupID: group.ID,
+	}))
+
+	stacks := []struct {
+		stack portainer.Stack
+		rc    *portainer.ResourceControl
+	}{
+		{
+			stack: portainer.Stack{ID: accessibleStackID, Name: "accessible", EndpointID: accessibleEnvID, Type: portainer.DockerComposeStack},
+			rc:    authorization.NewPublicResourceControl(stackutils.ResourceControlID(accessibleEnvID, "accessible"), portainer.StackResourceControl),
+		},
+		{
+			stack: portainer.Stack{ID: publicStackID, Name: "public", EndpointID: inaccessibleEnvID, Type: portainer.DockerComposeStack},
+			rc:    authorization.NewPublicResourceControl(stackutils.ResourceControlID(inaccessibleEnvID, "public"), portainer.StackResourceControl),
+		},
+		{
+			stack: portainer.Stack{ID: userOwnedStackID, Name: "owned", EndpointID: inaccessibleEnvID, Type: portainer.DockerComposeStack},
+			rc:    authorization.NewPrivateResourceControl(stackutils.ResourceControlID(inaccessibleEnvID, "owned"), portainer.StackResourceControl, userID),
+		},
+	}
+	for i := range stacks {
+		require.NoError(t, store.Stack().Create(&stacks[i].stack))
+		require.NoError(t, store.ResourceControl().Create(stacks[i].rc))
+	}
+
+	handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+	handler.DataStore = store
+
+	rr := serveAsUser(handler, userID, "/stacks")
+	require.Equal(t, http.StatusOK, rr.Code, rr.Body.String())
+
+	var got []portainer.Stack
+	require.NoError(t, json.NewDecoder(rr.Body).Decode(&got))
+
+	gotIDs := make([]portainer.StackID, 0, len(got))
+	for _, s := range got {
+		gotIDs = append(gotIDs, s.ID)
+	}
+	assert.Equal(t, []portainer.StackID{accessibleStackID}, gotIDs)
+}
 
 func TestFilterStacks(t *testing.T) {
 	t.Parallel()

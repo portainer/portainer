@@ -77,3 +77,28 @@ func TestLeaderTeamMembershipFilter_IgnoresOtherUsersLeadership(t *testing.T) {
 
 	require.False(t, filter(portainer.TeamMembership{ID: 2, UserID: 22, TeamID: 1, Role: 2}))
 }
+
+func TestAccessibleEndpointIDs(t *testing.T) {
+	t.Parallel()
+
+	groups := []portainer.EndpointGroup{
+		{ID: 1},
+		{ID: 2, UserAccessPolicies: portainer.UserAccessPolicies{1: {}}},
+	}
+	endpoints := []portainer.Endpoint{
+		{ID: 1, GroupID: 1, UserAccessPolicies: portainer.UserAccessPolicies{1: {}}},
+		{ID: 2, GroupID: 2},
+		{ID: 3, GroupID: 1},
+		{ID: 4, GroupID: 99, UserAccessPolicies: portainer.UserAccessPolicies{1: {}}},
+	}
+
+	ids := AccessibleEndpointIDs(endpoints, groups, &RestrictedRequestContext{UserID: 1})
+	require.ElementsMatch(t, []portainer.EndpointID{1, 2}, ids.Keys())
+
+	// the caller's slice is left untouched
+	require.Len(t, endpoints, 4)
+	require.NotNil(t, endpoints[0].UserAccessPolicies)
+
+	adminIDs := AccessibleEndpointIDs(endpoints, groups, &RestrictedRequestContext{IsAdmin: true})
+	require.ElementsMatch(t, []portainer.EndpointID{1, 2, 3, 4}, adminIDs.Keys())
+}

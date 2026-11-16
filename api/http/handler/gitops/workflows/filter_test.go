@@ -53,7 +53,14 @@ func TestWorkflowsList_RBAC_NonAdminWithAccess(t *testing.T) {
 	}
 	require.NoError(t, store.User().Create(user))
 
-	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{ID: 1, Name: "test-env"}))
+	group := &portainer.EndpointGroup{Name: "Unassigned"}
+	require.NoError(t, store.EndpointGroup().Create(group))
+	require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{
+		ID:                 1,
+		Name:               "test-env",
+		GroupID:            group.ID,
+		UserAccessPolicies: portainer.UserAccessPolicies{1: {}},
+	}))
 
 	const stackName = "rc-stack"
 	createGitStack(t, store, &portainer.Stack{

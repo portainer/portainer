@@ -103,7 +103,7 @@ func loadAccessibleStackMap(
 		return nil, err
 	}
 
-	accessMap, err := buildEndpointAccessMap(k8sFactory, sc, endpointMap)
+	accessMap, err := buildEndpointAccessMap(tx, k8sFactory, sc, endpointMap)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,6 @@ func FetchSourceStats(
 	k8sFactory *cli.ClientFactory,
 	sc *security.RestrictedRequestContext,
 ) (map[portainer.SourceID]SourceStats, error) {
-
 	allStacks, err := tx.Stack().ReadAll(func(s portainer.Stack) bool { return s.WorkflowID != 0 })
 	if err != nil {
 		return nil, err
@@ -184,7 +183,7 @@ func FetchSourceStats(
 		}
 	}
 
-	accessMap, err := buildEndpointAccessMap(k8sFactory, sc, endpointMap)
+	accessMap, err := buildEndpointAccessMap(tx, k8sFactory, sc, endpointMap)
 	if err != nil {
 		return nil, err
 	}
