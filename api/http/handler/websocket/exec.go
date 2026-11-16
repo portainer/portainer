@@ -108,6 +108,7 @@ func hijackExecStartOperation(
 
 	execStartRequest, err := createExecStartRequest(execID)
 	if err != nil {
+		conn.Close()
 		return err
 	}
 

@@ -119,6 +119,7 @@ func hijackAttachStartOperation(
 
 	attachStartRequest, err := createAttachStartRequest(attachID)
 	if err != nil {
+		conn.Close()
 		return err
 	}
 
