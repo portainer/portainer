@@ -1207,8 +1207,9 @@ func TestTransport_proxyNetworkRequest_ConnectionContainer(t *testing.T) {
 	require.NoError(t, err)
 
 	routes := RoutesDefinition{}
-	for _, name := range []string{"attackernet", "victimnet"} {
+	for _, name := range []string{"attackernet", "victimnet", "bridge"} {
 		routes[[2]string{http.MethodGet, "/networks/" + name}] = network.Inspect{ID: name + "id", Name: name}
+		routes[[2]string{http.MethodGet, "/networks/" + name + "id"}] = network.Inspect{ID: name + "id", Name: name}
 		routes[[2]string{http.MethodPost, "/networks/" + name + "/connect"}] = struct{}{}
 		routes[[2]string{http.MethodPost, "/networks/" + name + "/disconnect"}] = struct{}{}
 	}
@@ -1268,8 +1269,33 @@ func TestTransport_proxyNetworkRequest_ConnectionContainer(t *testing.T) {
 	// disconnecting another user's container from an owned network is forbidden
 	f(attacker, "disconnect", "attackernet", `{"Container":"victimctr","Force":true}`, http.StatusForbidden)
 
+	// an EndpointConfig.NetworkID naming an owned network by ID is allowed
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":{"NetworkID":"attackernetid"}}`, http.StatusOK)
+
+	// an EndpointConfig.NetworkID naming a built-in network is allowed
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":{"NetworkID":"bridgeid"}}`, http.StatusOK)
+
+	// an empty or null EndpointConfig is allowed
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":{}}`, http.StatusOK)
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":null}`, http.StatusOK)
+
+	// the daemon joins EndpointConfig.NetworkID over the URL network, so another user's network ID is forbidden
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":{"NetworkID":"victimnetid"}}`, http.StatusForbidden)
+
+	// another user's network referenced by name in EndpointConfig.NetworkID is forbidden too
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":{"NetworkID":"victimnet"}}`, http.StatusForbidden)
+
+	// lowercase keys, which the daemon also accepts, are forbidden too
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","endpointconfig":{"networkid":"victimnetid"}}`, http.StatusForbidden)
+
+	// a duplicated NetworkID key, where the daemon uses the last value, is forbidden too
+	f(attacker, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":{"NetworkID":"attackernetid","NetworkID":"victimnetid"}}`, http.StatusForbidden)
+
 	// administrators may connect any container to any network
 	f(admin, "connect", "victimnet", `{"Container":"attackerctr"}`, http.StatusOK)
+
+	// administrators may reference any network through EndpointConfig.NetworkID
+	f(admin, "connect", "attackernet", `{"Container":"attackerctr","EndpointConfig":{"NetworkID":"victimnetid"}}`, http.StatusOK)
 }
 
 func TestTransport_proxyDockerRequest_SlashInResourceID(t *testing.T) {

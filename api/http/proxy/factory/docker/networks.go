@@ -3,6 +3,7 @@ package docker
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"slices"
@@ -63,7 +64,8 @@ func (transport *Transport) networkConnectionOperation(request *http.Request, ne
 	request.Body = io.NopCloser(bytes.NewReader(body))
 
 	var connection struct {
-		Container string `json:"Container"`
+		Container      string                  `json:"Container"`
+		EndpointConfig PartialEndpointSettings `json:"EndpointConfig"`
 	}
 	if err := json.Unmarshal(body, &connection); err != nil {
 		return nil, err
@@ -80,6 +82,15 @@ func (transport *Transport) networkConnectionOperation(request *http.Request, ne
 
 	if !canAccess {
 		return utils.WriteAccessDeniedResponse()
+	}
+
+	networkNames := stackutils.ReferencedNetworkNames([]string{connection.EndpointConfig.NetworkID})
+	if err := transport.authorizeReferencedNetworks(tokenData.ID, networkNames, getClient); err != nil {
+		if errors.Is(err, ErrNetworkAccessForbidden) {
+			return utils.WriteAccessDeniedResponse()
+		}
+
+		return nil, err
 	}
 
 	return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
