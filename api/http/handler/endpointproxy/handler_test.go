@@ -44,7 +44,7 @@ func TestProxyRoutes_OnlyKubernetesAcceptsAKubeconfigToken(t *testing.T) {
 		{path: "/1/azure/subscriptions", want: "session"},
 		{path: "/1/agent/kubernetes/v2/browse", want: "session"},
 		{path: "/1/agent/docker/containers/json", want: "session"},
-		{path: "/1/agent/host/disk-usage", want: "session"},
+		{path: "/1/agent/host/docker-storage", want: "session"},
 	}
 
 	for _, tt := range tests {
