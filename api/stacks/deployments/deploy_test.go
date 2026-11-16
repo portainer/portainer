@@ -360,6 +360,57 @@ func Test_redeployWhenChanged_KubernetesStack(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func Test_redeployWhenChanged_InactiveStack(t *testing.T) {
+	t.Parallel()
+
+	store, stackID := setupRedeployStore(t, portainer.DockerComposeStack, 10)
+
+	err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		stack, err := tx.Stack().Read(stackID)
+		if err != nil {
+			return err
+		}
+
+		stack.Status = portainer.StackStatusInactive
+		stack.AutoUpdate = &portainer.AutoUpdateSettings{Webhook: "webhook-id"}
+
+		return tx.Stack().Update(stackID, stack)
+	})
+	require.NoError(t, err)
+
+	stackStatus := func() (portainer.StackStatus, error) {
+		var stack *portainer.Stack
+		err := store.ViewTx(func(tx dataservices.DataStoreTx) error {
+			var err error
+			stack, err = tx.Stack().Read(stackID)
+
+			return err
+		})
+		if err != nil {
+			return 0, err
+		}
+
+		return stack.Status, nil
+	}
+
+	// Polling skips inactive stacks even when they have a webhook
+	err = RedeployWhenChanged(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"), nil)
+	require.NoError(t, err)
+
+	status, err := stackStatus()
+	require.NoError(t, err)
+	require.Equal(t, portainer.StackStatusInactive, status)
+
+	// Webhooks redeploy inactive stacks in the background
+	err = RedeployWhenChangedFromWebhook(t.Context(), stackID, noopDeployer{}, store, testhelpers.NewGitService(nil, "newHash"), nil)
+	require.NoError(t, err)
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		status, err := stackStatus()
+		require.NoError(c, err)
+		assert.Equal(c, portainer.StackStatusActive, status)
+	}, 5*time.Second, 10*time.Millisecond)
+}
+
 type failingDeployer struct {
 	noopDeployer
 	deployErr error

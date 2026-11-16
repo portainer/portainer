@@ -37,6 +37,15 @@ var singleflightGroup = &singleflight.Group{}
 // RedeployWhenChanged pull and redeploy the stack when git repo changed
 // Stack will always be redeployed if force deployment is set to true
 func RedeployWhenChanged(ctx context.Context, stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService) error {
+	return redeployStackWhenChanged(ctx, stackID, deployer, datastore, gitService, fileService, true)
+}
+
+// RedeployWhenChangedFromWebhook pull and redeploy the stack when git repo changed, including inactive stacks
+func RedeployWhenChangedFromWebhook(ctx context.Context, stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService) error {
+	return redeployStackWhenChanged(ctx, stackID, deployer, datastore, gitService, fileService, false)
+}
+
+func redeployStackWhenChanged(ctx context.Context, stackID portainer.StackID, deployer StackDeployer, datastore dataservices.DataStore, gitService portainer.GitService, fileService portainer.FileService, skipInactive bool) error {
 	stack, err := datastore.Stack().Read(stackID)
 	if dataservices.IsErrObjectNotFound(err) {
 		return scheduler.NewPermanentError(errors.WithMessagef(err, "failed to get the stack %v", stackID))
@@ -44,7 +53,9 @@ func RedeployWhenChanged(ctx context.Context, stackID portainer.StackID, deploye
 		return errors.WithMessagef(err, "failed to get the stack %v", stackID)
 	}
 
-	if stack.Status == portainer.StackStatusInactive {
+	if skipInactive && stack.Status == portainer.StackStatusInactive {
+		log.Debug().Int("stack_id", int(stack.ID)).Msg("skipping the redeploy of an inactive stack")
+
 		return nil
 	}
 
