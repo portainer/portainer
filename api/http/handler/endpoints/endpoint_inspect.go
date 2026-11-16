@@ -51,6 +51,7 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 
 	hideFields(endpoint)
 	endpointutils.UpdateEdgeEndpointHeartbeat(endpoint, settings)
+	endpointutils.UpdateEdgeEndpointCheckinInterval(endpoint, settings)
 	endpoint.ComposeSyntaxMaxVersion = handler.ComposeStackManager.ComposeSyntaxMaxVersion()
 
 	excludeSnapshot, _ := request.RetrieveBooleanQueryParameter(r, "excludeSnapshot", true)

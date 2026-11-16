@@ -194,6 +194,17 @@ func UpdateEdgeEndpointHeartbeat(endpoint *portainer.Endpoint, settings *portain
 	endpoint.Heartbeat = GetHeartbeatStatus(endpoint, settings)
 }
 
+// UpdateEdgeEndpointCheckinInterval resolves the effective edge check-in interval
+// reported in API responses. Edge endpoints that don't define their own interval
+// fall back to the global default from the settings, while non-edge endpoints are
+// left untouched as the check-in interval is not relevant to them. This keeps the
+// value consistent across the endpoint list and inspect responses.
+func UpdateEdgeEndpointCheckinInterval(endpoint *portainer.Endpoint, settings *portainer.Settings) {
+	if IsEdgeEndpoint(endpoint) && endpoint.EdgeCheckinInterval == 0 {
+		endpoint.EdgeCheckinInterval = settings.EdgeAgentCheckinInterval
+	}
+}
+
 func GetHeartbeatStatus(endpoint *portainer.Endpoint, settings *portainer.Settings) bool {
 	checkInInterval := getEndpointCheckinInterval(endpoint, settings)
 	return time.Now().Unix()-endpoint.LastCheckInDate <= int64(checkInInterval*2+20)
