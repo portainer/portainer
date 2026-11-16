@@ -25390,6 +25390,14 @@ export type GetWebsocketExecErrors = {
    */
   400: unknown;
   /**
+   * Forbidden
+   */
+  403: unknown;
+  /**
+   * Not Found
+   */
+  404: unknown;
+  /**
    * Conflict
    */
   409: unknown;

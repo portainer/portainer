@@ -5,12 +5,14 @@ import (
 	"net/http"
 
 	portainer "github.com/portainer/portainer/api"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/validate"
 
+	"github.com/containerd/errdefs"
 	"github.com/gorilla/websocket"
 	"github.com/segmentio/encoding/json"
 )
@@ -34,6 +36,8 @@ type execStartOperationPayload struct {
 // @param nodeName query string false "node name"
 // @success 200
 // @failure 400
+// @failure 403
+// @failure 404
 // @failure 409
 // @failure 500
 // @router /websocket/exec [get]
@@ -63,10 +67,26 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
+	nodeName := r.FormValue("nodeName")
+
+	transport, err := handler.dockerTransport(endpoint)
+	if err != nil {
+		return httperror.InternalServerError("Unable to create the Docker transport", err)
+	}
+
+	canAccess, err := transport.CanAccessExecContainer(r, nodeName, execID)
+	if err != nil && !errdefs.IsNotFound(err) {
+		return httperror.InternalServerError("Unable to verify access to the container", err)
+	}
+
+	if !canAccess {
+		return httperror.Forbidden("Permission denied to access container", httperrors.ErrResourceAccessDenied)
+	}
+
 	params := &webSocketRequestParams{
 		endpoint: endpoint,
 		ID:       execID,
-		nodeName: r.FormValue("nodeName"),
+		nodeName: nodeName,
 	}
 
 	err = handler.handleExecRequest(w, r, params)

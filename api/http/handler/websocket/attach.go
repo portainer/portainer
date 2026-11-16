@@ -6,6 +6,7 @@ import (
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/logs"
 	"github.com/portainer/portainer/api/ws"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -13,6 +14,7 @@ import (
 	"github.com/portainer/portainer/pkg/validate"
 	"github.com/rs/zerolog/log"
 
+	"github.com/containerd/errdefs"
 	"github.com/gorilla/websocket"
 )
 
@@ -60,10 +62,30 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 		return httperror.Forbidden("Permission denied to access environment", err)
 	}
 
+	nodeName := r.FormValue("nodeName")
+
+	transport, err := handler.dockerTransport(endpoint)
+	if err != nil {
+		return httperror.InternalServerError("Unable to create the Docker transport", err)
+	}
+
+	containerID, err := transport.ResolveAccessibleContainerID(r, nodeName, attachID)
+	if err != nil && !errdefs.IsNotFound(err) {
+		return httperror.InternalServerError("Unable to verify access to the container", err)
+	}
+
+	if containerID == "" {
+		return httperror.Forbidden("Permission denied to access container", httperrors.ErrResourceAccessDenied)
+	}
+
+	query := r.URL.Query()
+	query.Set("id", containerID)
+	r.URL.RawQuery = query.Encode()
+
 	params := &webSocketRequestParams{
 		endpoint: endpoint,
-		ID:       attachID,
-		nodeName: r.FormValue("nodeName"),
+		ID:       containerID,
+		nodeName: nodeName,
 	}
 
 	err = handler.handleAttachRequest(w, r, params)

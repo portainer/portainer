@@ -11910,6 +11910,10 @@ paths:
           description: OK
         "400":
           description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
         "409":
           description: Conflict
         "500":
