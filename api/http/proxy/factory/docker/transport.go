@@ -264,8 +264,8 @@ func (transport *Transport) proxyConfigRequest(request *http.Request, unversione
 		return transport.rewriteOperation(request, transport.configListOperation)
 
 	default:
-		// Assume /configs/{id}
-		configID := path.Base(requestPath)
+		// Assume /configs/{id} or /configs/{id}/update
+		configID, _, _ := strings.Cut(strings.TrimPrefix(requestPath, "/configs/"), "/")
 
 		switch request.Method {
 		case http.MethodGet:
@@ -292,37 +292,33 @@ func (transport *Transport) proxyContainerRequest(request *http.Request, unversi
 		return transport.rewriteOperationWithLabelFiltering(request, transport.containerListOperation)
 
 	default:
-		// This section assumes /containers/**
-		if match, _ := path.Match("/containers/*/*", requestPath); match {
-			// Handle /containers/{id}/{action} requests
-			containerID := path.Base(path.Dir(requestPath))
-			action := path.Base(requestPath)
+		// This section assumes /containers/{id} or /containers/{id}/{action}, where {id} may contain slashes
+		containerPath, ok := strings.CutPrefix(requestPath, "/containers/")
+		if !ok {
+			return transport.executeDockerRequest(request)
+		}
 
-			if action == "json" {
-				return transport.rewriteOperation(request, transport.containerInspectOperation)
-			}
+		if request.Method == http.MethodDelete {
+			return transport.executeGenericResourceDeletionOperation(request, containerPath, containerPath, portainer.ContainerResourceControl)
+		}
 
-			if action == "update" {
-				return transport.decorateContainerUpdateOperation(request, containerID)
-			}
-
-			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
-		} else if match, _ := path.Match("/containers/*", requestPath); match {
-			// Handle /containers/{id} requests
-			containerID := path.Base(requestPath)
-
-			if request.Method == http.MethodDelete {
-				return transport.executeGenericResourceDeletionOperation(request, containerID, containerID, portainer.ContainerResourceControl)
-			}
-
-			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
-		} else if match, _ := path.Match("/containers/*/attach/ws", requestPath); match {
-			containerID := path.Base(path.Dir(path.Dir(requestPath)))
-
+		if containerID, ok := strings.CutSuffix(containerPath, "/attach/ws"); ok {
 			return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
 		}
 
-		return transport.executeDockerRequest(request)
+		containerID, action := containerPath, ""
+		if i := strings.LastIndex(containerPath, "/"); i >= 0 {
+			containerID, action = containerPath[:i], containerPath[i+1:]
+		}
+
+		switch action {
+		case "json":
+			return transport.rewriteOperation(request, transport.containerInspectOperation)
+		case "update":
+			return transport.decorateContainerUpdateOperation(request, containerID)
+		}
+
+		return transport.restrictedResourceOperation(request, containerID, containerID, portainer.ContainerResourceControl, false)
 	}
 }
 
@@ -443,37 +439,37 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request, unversione
 	}
 }
 
-func match(requestPath string, pattern string) bool {
-	ok, err := path.Match(pattern, requestPath)
-	return err == nil && ok
-}
-
 func (transport *Transport) proxyNetworkRequest(request *http.Request, unversionedPath string) (*http.Response, error) {
 	requestPath := unversionedPath
 
-	switch {
-	case requestPath == "/networks/create":
+	switch requestPath {
+	case "/networks/create":
 		return transport.decorateGenericResourceCreationOperation(request, networkObjectIdentifier, portainer.NetworkResourceControl)
 
-	case requestPath == "/networks":
+	case "/networks":
 		return transport.rewriteOperation(request, transport.networkListOperation)
+	}
 
-	case request.Method == http.MethodPost && match(requestPath, "/networks/*/connect"),
-		request.Method == http.MethodPost && match(requestPath, "/networks/*/disconnect"):
+	// Assume /networks/{id} or /networks/{id}/{action}, where {id} may contain slashes
+	networkID := strings.TrimPrefix(requestPath, "/networks/")
 
-		networkID := path.Base(path.Dir(requestPath))
-		return transport.networkConnectionOperation(request, networkID)
+	switch request.Method {
+	case http.MethodPost:
+		if id, ok := strings.CutSuffix(networkID, "/connect"); ok {
+			return transport.networkConnectionOperation(request, id)
+		}
 
-	case request.Method == http.MethodGet && match(requestPath, "/networks/*"):
+		if id, ok := strings.CutSuffix(networkID, "/disconnect"); ok {
+			return transport.networkConnectionOperation(request, id)
+		}
+
+	case http.MethodGet:
 		return transport.rewriteOperation(request, transport.networkInspectOperation)
 
-	case request.Method == http.MethodDelete && match(requestPath, "/networks/*"):
-		networkID := path.Base(requestPath)
+	case http.MethodDelete:
 		return transport.executeGenericResourceDeletionOperation(request, networkID, networkID, portainer.NetworkResourceControl)
 	}
 
-	// Assume /networks/{id}
-	networkID := path.Base(requestPath)
 	return transport.restrictedResourceOperation(request, networkID, networkID, portainer.NetworkResourceControl, false)
 }
 
@@ -488,8 +484,8 @@ func (transport *Transport) proxySecretRequest(request *http.Request, unversione
 		return transport.rewriteOperation(request, transport.secretListOperation)
 
 	default:
-		// Assume /secrets/{id}
-		secretID := path.Base(requestPath)
+		// Assume /secrets/{id} or /secrets/{id}/update
+		secretID, _, _ := strings.Cut(strings.TrimPrefix(requestPath, "/secrets/"), "/")
 
 		switch request.Method {
 		case http.MethodGet:

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"path"
+	"strings"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
@@ -240,7 +240,7 @@ func (transport *Transport) restrictedVolumeOperation(requestPath string, reques
 		return transport.rewriteOperation(request, transport.volumeInspectOperation)
 	}
 
-	volumeName := path.Base(requestPath)
+	volumeName := strings.TrimPrefix(requestPath, "/volumes/")
 
 	resourceID, err := transport.getVolumeResourceID(volumeName)
 	if err != nil {

@@ -10,6 +10,8 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/docker/docker/api/types/system"
+	"github.com/docker/docker/api/types/volume"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
@@ -1268,4 +1270,155 @@ func TestTransport_proxyNetworkRequest_ConnectionContainer(t *testing.T) {
 
 	// administrators may connect any container to any network
 	f(admin, "connect", "victimnet", `{"Container":"attackerctr"}`, http.StatusOK)
+}
+
+func TestTransport_proxyDockerRequest_SlashInResourceID(t *testing.T) {
+	t.Parallel()
+
+	admin := portainer.User{ID: 1, Username: "admin", Role: portainer.AdministratorRole}
+	attacker := portainer.User{ID: 2, Username: "attacker", Role: portainer.StandardUserRole}
+	victim := portainer.User{ID: 3, Username: "victim", Role: portainer.StandardUserRole}
+
+	_, ds := datastore.MustNewTestStore(t, true, false)
+
+	endpoint := &portainer.Endpoint{ID: 1, Name: "env"}
+
+	err := ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
+		for _, user := range []*portainer.User{&admin, &attacker, &victim} {
+			if err := tx.User().Create(user); err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Endpoint().Create(endpoint); err != nil {
+			return err
+		}
+
+		for _, rc := range []*portainer.ResourceControl{
+			authorization.NewPrivateResourceControl("attackernetid", portainer.NetworkResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("connectnetid", portainer.NetworkResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("ownnetid", portainer.NetworkResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimnetid", portainer.NetworkResourceControl, victim.ID),
+			authorization.NewPrivateResourceControl("attackerctrid", portainer.ContainerResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimctrid", portainer.ContainerResourceControl, victim.ID),
+			authorization.NewPrivateResourceControl("attackervol_dockerid", portainer.VolumeResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("updatecfgid", portainer.ConfigResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimcfgid", portainer.ConfigResourceControl, victim.ID),
+			authorization.NewPrivateResourceControl("updatesecretid", portainer.SecretResourceControl, attacker.ID),
+			authorization.NewPrivateResourceControl("victimsecretid", portainer.SecretResourceControl, victim.ID),
+		} {
+			if err := tx.ResourceControl().Create(rc); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	require.NoError(t, err)
+
+	attackerCtr := container.InspectResponse{ContainerJSONBase: &container.ContainerJSONBase{ID: "attackerctrid", Name: "/attackerctr"}, Config: &container.Config{}}
+	victimCtr := container.InspectResponse{ContainerJSONBase: &container.ContainerJSONBase{ID: "victimctrid", Name: "/victimctr"}, Config: &container.Config{}}
+
+	srv, version := mockDockerAPIServer(t, RoutesDefinition{
+		{http.MethodGet, "/networks/attackernet"}:                    network.Inspect{ID: "attackernetid", Name: "attackernet"},
+		{http.MethodGet, "/networks/connect"}:                        network.Inspect{ID: "connectnetid", Name: "connect"},
+		{http.MethodGet, "/networks/victim/attackernet"}:             network.Inspect{ID: "victimnetid", Name: "victim/attackernet"},
+		{http.MethodPost, "/networks/victim/attackernet/connect"}:    struct{}{},
+		{http.MethodPost, "/networks/victim/attackernet/disconnect"}: struct{}{},
+		{http.MethodDelete, "/networks/victim/attackernet"}:          struct{}{},
+		{http.MethodGet, "/networks/attacker/ownnet"}:                network.Inspect{ID: "ownnetid", Name: "attacker/ownnet"},
+		{http.MethodPost, "/networks/attacker/ownnet/connect"}:       struct{}{},
+		{http.MethodDelete, "/networks/attacker/ownnet"}:             struct{}{},
+		{http.MethodGet, "/containers/attackerctr/json"}:             attackerCtr,
+		{http.MethodGet, "/containers/attackerctr/alias/json"}:       victimCtr,
+		{http.MethodGet, "/containers/attackerctr/alias/logs"}:       struct{}{},
+		{http.MethodPost, "/containers/attackerctr/alias/start"}:     struct{}{},
+		{http.MethodDelete, "/containers/attackerctr/alias"}:         struct{}{},
+		{http.MethodPost, "/containers/attackerctr/start"}:           struct{}{},
+		{http.MethodGet, "/info"}:                                    system.Info{ID: "dockerid"},
+		{http.MethodGet, "/volumes/victim/attackervol"}:              volume.Volume{Name: "victim/attackervol"},
+		{http.MethodDelete, "/volumes/victim/attackervol"}:           struct{}{},
+		{http.MethodGet, "/configs/update"}:                          swarm.Config{ID: "updatecfgid"},
+		{http.MethodGet, "/configs/victimcfg"}:                       swarm.Config{ID: "victimcfgid"},
+		{http.MethodPost, "/configs/update/update"}:                  struct{}{},
+		{http.MethodPost, "/configs/victimcfg/update"}:               struct{}{},
+		{http.MethodGet, "/secrets/update"}:                          swarm.Secret{ID: "updatesecretid"},
+		{http.MethodGet, "/secrets/victimsecret"}:                    swarm.Secret{ID: "victimsecretid"},
+		{http.MethodPost, "/secrets/update/update"}:                  struct{}{},
+		{http.MethodPost, "/secrets/victimsecret/update"}:            struct{}{},
+	})
+	t.Cleanup(srv.Close)
+
+	endpoint.URL = srv.URL
+
+	transport := &Transport{
+		endpoint:      endpoint,
+		dataStore:     ds,
+		HTTPTransport: &http.Transport{},
+	}
+
+	f := func(user portainer.User, method string, url string, body string, wantStatus int) {
+		t.Helper()
+
+		req := httptest.NewRequest(method, srv.URL+"/v"+version+url, strings.NewReader(body))
+		req = req.WithContext(security.StoreTokenData(req, &portainer.TokenData{ID: user.ID, Username: user.Username, Role: user.Role}))
+
+		resp, err := transport.proxyDockerRequest(req, false)
+		require.NoError(t, err)
+		require.Equal(t, wantStatus, resp.StatusCode)
+		require.NoError(t, resp.Body.Close())
+	}
+
+	// connecting to another user's network whose name contains a slash is forbidden, even when owning a network named after the verb
+	f(attacker, http.MethodPost, "/networks/victim/attackernet/connect", `{"Container":"attackerctr"}`, http.StatusForbidden)
+
+	// disconnecting from that network is forbidden too
+	f(attacker, http.MethodPost, "/networks/victim/attackernet/disconnect", `{"Container":"attackerctr"}`, http.StatusForbidden)
+
+	// inspecting that network is forbidden, even when owning a network named after its last path segment
+	f(attacker, http.MethodGet, "/networks/victim/attackernet", "", http.StatusForbidden)
+
+	// deleting that network is forbidden
+	f(attacker, http.MethodDelete, "/networks/victim/attackernet", "", http.StatusForbidden)
+
+	// an owned network whose name contains a slash can still be connected to, inspected and deleted
+	f(attacker, http.MethodPost, "/networks/attacker/ownnet/connect", `{"Container":"attackerctr"}`, http.StatusOK)
+	f(attacker, http.MethodGet, "/networks/attacker/ownnet", "", http.StatusOK)
+	f(attacker, http.MethodDelete, "/networks/attacker/ownnet", "", http.StatusOK)
+
+	// administrators may connect to any network whose name contains a slash
+	f(admin, http.MethodPost, "/networks/victim/attackernet/connect", `{"Container":"victimctr"}`, http.StatusOK)
+
+	// a legacy link name resolving to another user's container cannot be inspected
+	f(attacker, http.MethodGet, "/containers/attackerctr/alias/json", "", http.StatusForbidden)
+
+	// nor read through any other action
+	f(attacker, http.MethodGet, "/containers/attackerctr/alias/logs", "", http.StatusForbidden)
+
+	// nor started
+	f(attacker, http.MethodPost, "/containers/attackerctr/alias/start", "", http.StatusForbidden)
+
+	// nor deleted
+	f(attacker, http.MethodDelete, "/containers/attackerctr/alias", "", http.StatusForbidden)
+
+	// an owned container keeps working
+	f(attacker, http.MethodPost, "/containers/attackerctr/start", "", http.StatusOK)
+
+	// administrators may act on a container through its link name
+	f(admin, http.MethodPost, "/containers/attackerctr/alias/start", "", http.StatusOK)
+
+	// deleting another user's volume whose name contains a slash is forbidden, even when owning a volume named after its last path segment
+	f(attacker, http.MethodDelete, "/volumes/victim/attackervol", "", http.StatusForbidden)
+
+	// updating another user's config is forbidden, even when owning a config named update
+	f(attacker, http.MethodPost, "/configs/victimcfg/update", "", http.StatusForbidden)
+
+	// updating an owned config named update is allowed
+	f(attacker, http.MethodPost, "/configs/update/update", "", http.StatusOK)
+
+	// updating another user's secret is forbidden, even when owning a secret named update
+	f(attacker, http.MethodPost, "/secrets/victimsecret/update", "", http.StatusForbidden)
+
+	// updating an owned secret named update is allowed
+	f(attacker, http.MethodPost, "/secrets/update/update", "", http.StatusOK)
 }
