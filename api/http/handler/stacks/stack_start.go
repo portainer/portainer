@@ -29,7 +29,7 @@ import (
 // @security ApiKeyAuth
 // @security jwt
 // @param id path int true "Stack identifier"
-// @param endpointId query int true "Environment identifier"
+// @param endpointId query int true "Environment(Endpoint) identifier the stack belongs to"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
@@ -81,6 +81,10 @@ func (handler *Handler) stackStart(w http.ResponseWriter, r *http.Request) *http
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
 		return httperror.BadRequest("Invalid query parameter: endpointId", err)
+	}
+
+	if httpErr := handler.authorizeStackActionEndpointID(securityContext, stack, portainer.EndpointID(endpointID)); httpErr != nil {
+		return httpErr
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))

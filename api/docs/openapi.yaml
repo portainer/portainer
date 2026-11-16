@@ -9871,7 +9871,7 @@ paths:
           required: true
           schema:
             type: integer
-        - description: Environment identifier
+        - description: Environment(Endpoint) identifier the stack belongs to
           in: query
           name: endpointId
           required: true
@@ -9913,7 +9913,7 @@ paths:
           required: true
           schema:
             type: integer
-        - description: Environment identifier
+        - description: Environment(Endpoint) identifier the stack belongs to
           in: query
           name: endpointId
           required: true

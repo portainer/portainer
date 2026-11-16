@@ -23175,7 +23175,7 @@ export type StackStartData = {
   };
   query: {
     /**
-     * Environment identifier
+     * Environment(Endpoint) identifier the stack belongs to
      */
     endpointId: number;
   };
@@ -23224,7 +23224,7 @@ export type StackStopData = {
   };
   query: {
     /**
-     * Environment identifier
+     * Environment(Endpoint) identifier the stack belongs to
      */
     endpointId: number;
   };

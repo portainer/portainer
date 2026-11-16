@@ -32,3 +32,22 @@ func resolveStackEndpointID(
 
 	return requestedID, nil
 }
+
+func (handler *Handler) authorizeStackActionEndpointID(sc *security.RestrictedRequestContext, stack *portainer.Stack, requestedID portainer.EndpointID) *httperror.HandlerError {
+	if requestedID == stack.EndpointID {
+		return nil
+	}
+
+	if !sc.IsAdmin {
+		return httperror.Forbidden("Permission denied to access environment", errStackEndpointMismatch)
+	}
+
+	_, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	if err == nil {
+		return httperror.Forbidden("Permission denied to access environment", errStackEndpointMismatch)
+	} else if !handler.DataStore.IsErrObjectNotFound(err) {
+		return httperror.InternalServerError("Unable to find the environment associated to the stack inside the database", err)
+	}
+
+	return nil
+}

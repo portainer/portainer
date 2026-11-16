@@ -24317,7 +24317,7 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Environment identifier
+      - description: Environment(Endpoint) identifier the stack belongs to
         in: query
         name: endpointId
         required: true
@@ -24355,7 +24355,7 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Environment identifier
+      - description: Environment(Endpoint) identifier the stack belongs to
         in: query
         name: endpointId
         required: true
