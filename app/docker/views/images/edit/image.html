@@ -122,6 +122,17 @@
                 </button>
               </td>
             </tr>
+            <tr ng-if="image.RepoDigests.length > 0">
+              <td>Digests</td>
+              <td class="datatable">
+                <table class="table-bordered table-condensed table">
+                  <tr ng-repeat="d in image.RepoDigests">
+                    <td>{{ d.includes('@') ? d.substring(0, d.indexOf('@')) : '' }}</td>
+                    <td>{{ d.includes('@') ? d.substring(d.indexOf('@') + 1) : d }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
             <tr ng-if="image.Parent">
               <td>Parent</td>
               <td
