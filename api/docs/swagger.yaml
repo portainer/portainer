@@ -17238,7 +17238,7 @@ paths:
         "403":
           description: Permission denied
         "404":
-          description: endpoint not found
+          description: endpoint not found, or service not found or not accessible
         "500":
           description: Server error
       security:

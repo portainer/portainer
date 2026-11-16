@@ -6,17 +6,23 @@ import (
 	"strings"
 
 	portaineree "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/docker/consts"
 	"github.com/portainer/portainer/api/docker/images"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"github.com/portainer/portainer/api/logs"
+	"github.com/portainer/portainer/api/uac"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 	"github.com/portainer/portainer/pkg/libhttp/request"
 	"github.com/portainer/portainer/pkg/libhttp/response"
 	"github.com/rs/zerolog/log"
 
+	cerrdefs "github.com/containerd/errdefs"
 	dockertypes "github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/swarm"
 )
 
 type forceUpdateServicePayload struct {
@@ -44,7 +50,7 @@ func (payload *forceUpdateServicePayload) Validate(r *http.Request) error {
 // @success 200 {object} swarm.ServiceUpdateResponse "Success"
 // @failure 400 "Invalid request"
 // @failure 403 "Permission denied"
-// @failure 404 "endpoint not found"
+// @failure 404 "endpoint not found, or service not found or not accessible"
 // @failure 500 "Server error"
 // @router /endpoints/{id}/forceupdateservice [put]
 func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -82,9 +88,19 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 		}
 	}()
 
-	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), payload.ServiceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
-	if err != nil {
+	service, _, err := dockerClient.ServiceInspectWithRaw(
+		context.Background(),
+		payload.ServiceID,
+		dockertypes.ServiceInspectOptions{InsertDefaults: true},
+	)
+	if cerrdefs.IsNotFound(err) {
+		return httperror.NotFound("service not found", nil)
+	} else if err != nil {
 		return httperror.InternalServerError("Error looking up service", err)
+	}
+
+	if httpErr := handler.authorizeServiceForceUpdate(r, endpoint, service); httpErr != nil {
+		return httpErr
 	}
 
 	service.Spec.TaskTemplate.ForceUpdate++
@@ -93,7 +109,13 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 		service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
 	}
 
-	newService, err := dockerClient.ServiceUpdate(context.Background(), payload.ServiceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
+	newService, err := dockerClient.ServiceUpdate(
+		context.Background(),
+		service.ID,
+		service.Version,
+		service.Spec,
+		dockertypes.ServiceUpdateOptions{QueryRegistry: true},
+	)
 	if err != nil {
 		return httperror.InternalServerError("Error force update service", err)
 	}
@@ -104,13 +126,13 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 	go func() {
 		defer logs.CloseAndLogErr(dockerClient)
 
-		images.EvictImageStatus(payload.ServiceID)
+		images.EvictImageStatus(service.ID)
 		images.EvictImageStatus(service.Spec.Labels[consts.SwarmStackNameLabel])
 
 		// ignore errors from this cleanup function, log them instead
 		containers, err := dockerClient.ContainerList(context.TODO(), container.ListOptions{
 			All:     true,
-			Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIDLabel+"="+payload.ServiceID)),
+			Filters: filters.NewArgs(filters.Arg("label", consts.SwarmServiceIDLabel+"="+service.ID)),
 		})
 		if err != nil {
 			log.Warn().Err(err).Str("Environment", endpoint.Name).Msg("Error listing containers")
@@ -122,4 +144,41 @@ func (handler *Handler) endpointForceUpdateService(w http.ResponseWriter, r *htt
 	}()
 
 	return response.JSON(w, newService)
+}
+
+// authorizeServiceForceUpdate applies the service resource control, as the Docker proxy does for service updates
+func (handler *Handler) authorizeServiceForceUpdate(
+	r *http.Request,
+	endpoint *portaineree.Endpoint,
+	service swarm.Service,
+) *httperror.HandlerError {
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return httperror.InternalServerError("Unable to retrieve user details from request context", err)
+	}
+
+	if securityContext.IsAdmin {
+		return nil
+	}
+
+	var resourceControl *portaineree.ResourceControl
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		resourceControl, err = uac.ServiceResourceControlGetter(tx, endpoint.ID)(service)
+		return err
+	}); err != nil {
+		return httperror.InternalServerError("Unable to verify service access", err)
+	}
+
+	if !authorization.UserCanAccessResource(
+		securityContext.UserID,
+		authorization.TeamIDs(securityContext.UserMemberships),
+		resourceControl,
+	) {
+		// returned a 404 both for missing services and for services the caller cannot access,
+		// so the response does not reveal whether a service exists
+		return httperror.NotFound("service not found", nil)
+	}
+
+	return nil
 }

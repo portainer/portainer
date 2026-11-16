@@ -15700,7 +15700,7 @@ export type EndpointForceUpdateServiceErrors = {
    */
   403: unknown;
   /**
-   * endpoint not found
+   * endpoint not found, or service not found or not accessible
    */
   404: unknown;
   /**
