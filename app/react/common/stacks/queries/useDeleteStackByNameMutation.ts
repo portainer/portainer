@@ -21,10 +21,10 @@ export function useDeleteStackByNameMutation() {
   return useMutation({
     mutationFn: deleteStackByName,
     onSuccess: (_, variables) => {
-      // Invalidate the specific stack query
-      queryClient.invalidateQueries(queryKeys.stack(variables.stackId));
-      // Invalidate all stacks queries
-      queryClient.invalidateQueries(queryKeys.base());
+      // cancelQueries, not invalidateQueries: invalidating would refetch the
+      // deleted stack while its detail view is still mounted, and error out
+      queryClient.cancelQueries(queryKeys.stack(variables.stackId));
+      return queryClient.invalidateQueries(queryKeys.lists());
     },
     ...withError('Unable to delete stack'),
   });

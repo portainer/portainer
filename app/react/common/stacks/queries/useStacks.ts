@@ -8,7 +8,7 @@ import { buildStackUrl } from './buildUrl';
 import { queryKeys } from './query-keys';
 
 export function useStacks() {
-  return useQuery(queryKeys.base(), () => getStacks(), {
+  return useQuery(queryKeys.lists(), () => getStacks(), {
     ...withError('Failed loading stack'),
   });
 }
