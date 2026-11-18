@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { getDefaultLogLines, saveDefaultLogLines } from '@/docker/helpers/logViewerSettings';
 
 angular.module('portainer.docker').controller('ServiceLogsController', [
   '$scope',
@@ -6,13 +7,20 @@ angular.module('portainer.docker').controller('ServiceLogsController', [
   '$interval',
   'ServiceService',
   'Notifications',
-  function ($scope, $transition$, $interval, ServiceService, Notifications) {
+  'localStorageService',
+  function ($scope, $transition$, $interval, ServiceService, Notifications, localStorageService) {
     $scope.state = {
       refreshRate: 3,
-      lineCount: 100,
+      lineCount: getDefaultLogLines(localStorageService),
       sinceTimestamp: '',
       displayTimestamps: false,
     };
+
+    $scope.$watch('state.lineCount', function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        saveDefaultLogLines(localStorageService, newValue);
+      }
+    });
 
     $scope.changeLogCollection = function (logCollectionStatus) {
       if (!logCollectionStatus) {
