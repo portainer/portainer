@@ -6,12 +6,19 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	ce "github.com/portainer/portainer/api/gitops/workflows"
+	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/set"
 	"github.com/portainer/portainer/api/slicesx"
 )
 
-// FetchSourceWorkflows returns the workflows and stats for a single source.
-func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([]Workflow, ce.SourceStats, error) {
+// FetchSourceWorkflows returns the workflows of a single source that sc can access.
+func FetchSourceWorkflows(
+	tx dataservices.DataStoreTx,
+	k8sFactory *cli.ClientFactory,
+	sc *security.RestrictedRequestContext,
+	src *portainer.Source,
+) ([]Workflow, error) {
 	wfs, err := tx.Workflow().ReadAll(func(wf portainer.Workflow) bool {
 		return slices.ContainsFunc(wf.Artifacts, func(artifact portainer.Artifact) bool {
 			return slices.ContainsFunc(artifact.Files, func(f portainer.ArtifactFile) bool {
@@ -20,11 +27,11 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 		})
 	})
 	if err != nil {
-		return nil, ce.SourceStats{}, err
+		return nil, err
 	}
 
 	if len(wfs) == 0 {
-		return nil, ce.SourceStats{}, nil
+		return nil, nil
 	}
 
 	wfIDSet := set.ToSet(slicesx.Map(wfs, func(wf portainer.Workflow) portainer.WorkflowID { return wf.ID }))
@@ -34,7 +41,12 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 		return ok
 	})
 	if err != nil {
-		return nil, ce.SourceStats{}, err
+		return nil, err
+	}
+
+	stacks, err = ce.AccessibleStacks(tx, k8sFactory, sc, stacks)
+	if err != nil {
+		return nil, err
 	}
 
 	artifactByStack := make(map[portainer.StackID]portainer.ArtifactFile)
@@ -57,7 +69,6 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 
 	unknown := ce.WorkflowPhaseStatus{Status: ce.StatusUnknown}
 	items := make([]Workflow, 0, len(stacks))
-	stats := ce.SourceStats{EndpointIDs: set.Set[portainer.EndpointID]{}}
 
 	for _, stack := range stacks {
 		cfg := src.Git.ToRepoConfig()
@@ -67,11 +78,7 @@ func FetchSourceWorkflows(tx dataservices.DataStoreTx, src *portainer.Source) ([
 			cfg.ConfigHash = file.Hash
 		}
 		items = append(items, MapStackToWorkflow(stack, src.ID, cfg, unknown, unknown))
-		stats.WorkflowCount++
-		if stack.EndpointID != 0 {
-			stats.EndpointIDs.Add(stack.EndpointID)
-		}
 	}
 
-	return items, stats, nil
+	return items, nil
 }

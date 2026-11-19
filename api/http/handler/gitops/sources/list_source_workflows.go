@@ -50,7 +50,7 @@ func (h *Handler) listSourceWorkflows(w http.ResponseWriter, r *http.Request) *h
 		}
 
 		var err error
-		sourceWfs, _, err = FetchSourceWorkflows(tx, source)
+		sourceWfs, err = FetchSourceWorkflows(tx, h.k8sFactory, securityContext, source)
 		return err
 	})
 

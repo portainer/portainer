@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/kubernetes/cli"
 	"github.com/portainer/portainer/api/set"
+	"github.com/portainer/portainer/api/slicesx"
 )
 
 // FetchWorkflows returns all GitOps workflows visible to the given user
@@ -93,6 +94,27 @@ func loadAccessibleStackMap(
 		return nil, err
 	}
 
+	stacks, err = AccessibleStacks(tx, k8sFactory, sc, stacks)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[portainer.StackID]portainer.Stack, len(stacks))
+	for _, stack := range stacks {
+		result[stack.ID] = stack
+	}
+
+	return result, nil
+}
+
+// AccessibleStacks returns the stacks sc can access through environment access, Docker UAC and
+// Kubernetes namespace RBAC.
+func AccessibleStacks(
+	tx dataservices.DataStoreTx,
+	k8sFactory *cli.ClientFactory,
+	sc *security.RestrictedRequestContext,
+	stacks []portainer.Stack,
+) ([]portainer.Stack, error) {
 	endpointMap, err := BuildEndpointMap(tx, stacks)
 	if err != nil {
 		return nil, err
@@ -108,20 +130,13 @@ func loadAccessibleStackMap(
 		return nil, err
 	}
 
-	result := make(map[portainer.StackID]portainer.Stack, len(stacks))
-	for _, stack := range stacks {
+	return slicesx.Filter(stacks, func(stack portainer.Stack) bool {
 		if ep, ok := endpointMap[stack.EndpointID]; ok && !EndpointMatchesStackType(ep, stack.Type) {
-			continue
+			return false
 		}
 
-		if !isK8SNamespaceAccessible(stack, accessMap) {
-			continue
-		}
-
-		result[stack.ID] = stack
-	}
-
-	return result, nil
+		return isK8SNamespaceAccessible(stack, accessMap)
+	}), nil
 }
 
 // SourceStats holds aggregated statistics for a GitOps source.
