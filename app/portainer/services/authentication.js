@@ -18,6 +18,10 @@ angular.module('portainer.app').factory('Authentication', [
     'use strict';
 
     var user = {};
+    // Tracks how the current session was established, so logout can tell
+    // an OAuth session (which must be redirected to the IdP logout URL)
+    // apart from an internal login. Reset by cleanUserData() on logout.
+    var authMethod = null;
     if (process.env.NODE_ENV === 'development') {
       window.login = loginAsync;
     }
@@ -28,6 +32,7 @@ angular.module('portainer.app').factory('Authentication', [
       login,
       logout,
       isAuthenticated,
+      isOAuthLogin,
       getUserDetails,
       isAdmin,
       isEdgeAdmin,
@@ -75,6 +80,7 @@ angular.module('portainer.app').factory('Authentication', [
     async function OAuthLoginAsync(code) {
       await OAuth.validate({ code: code }).$promise;
       await loadUserData();
+      authMethod = 'oauth';
     }
 
     function OAuthLogin(code) {
@@ -84,6 +90,7 @@ angular.module('portainer.app').factory('Authentication', [
     async function loginAsync(username, password) {
       await Auth.login({ username: username, password: password }).$promise;
       await loadUserData();
+      authMethod = 'internal';
     }
 
     function login(username, password) {
@@ -94,12 +101,17 @@ angular.module('portainer.app').factory('Authentication', [
       return !!user.ID;
     }
 
+    function isOAuthLogin() {
+      return authMethod === 'oauth';
+    }
+
     function getUserDetails() {
       return user;
     }
 
     function cleanUserData() {
       user = {};
+      authMethod = null;
     }
 
     async function loadUserData() {
