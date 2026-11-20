@@ -9,6 +9,7 @@ export interface StateManager {
 export interface IAuthenticationService {
   getUserDetails(): { ID: number };
   isAuthenticated(): boolean;
+  isOAuthLogin(): boolean;
   isAdmin(noEnvScope?: boolean): boolean;
   isPureAdmin(): boolean;
   hasAuthorizations(authorizations: string[]): boolean;

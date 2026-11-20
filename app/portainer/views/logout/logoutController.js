@@ -29,6 +29,13 @@ class LogoutController {
     const error = this.$transition$.params().error;
     const settings = await this.SettingsService.publicSettings();
 
+    // Capture the user details BEFORE logout: Authentication.logout()
+    // clears the user data (cleanUserData() sets user = {}), so reading
+    // getUserDetails().ID afterwards always yields undefined and the
+    // ID 1 exemption below could never apply.
+    const userId = this.Authentication.getUserDetails().ID;
+    const isOAuthLogin = typeof this.Authentication.isOAuthLogin === 'function' ? this.Authentication.isOAuthLogin() : true;
+
     try {
       await this.Authentication.logout();
     } finally {
@@ -37,7 +44,7 @@ class LogoutController {
 
       cleanReturnUrl();
       this.LocalStorage.storeLogoutReason(error);
-      if (settings.OAuthLogoutURI && this.Authentication.getUserDetails().ID !== 1) {
+      if (settings.OAuthLogoutURI && isOAuthLogin && userId !== 1) {
         this.$window.location.href = settings.OAuthLogoutURI;
       } else {
         this.$state.go('portainer.auth', { reload: true });
