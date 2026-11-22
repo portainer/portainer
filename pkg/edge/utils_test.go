@@ -1,6 +1,7 @@
 package edge
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,5 +60,38 @@ func TestIsValidEdgeStackName(t *testing.T) {
 	f("-", false)
 	f("_", false)
 	f("E", false)
-	f("eedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackdgeedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackedgestackstack", false)
+	f(strings.Repeat("a", 256), false)
+}
+
+func TestValidateHelmEdgeStackName(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		stackName string
+		wantErr   bool
+	}{
+		{name: "lowercase letters, digits and hyphens", stackName: "my-app-1", wantErr: false},
+		{name: "longest accepted name", stackName: strings.Repeat("a", maxHelmEdgeStackNameLength), wantErr: false},
+		{name: "uppercase letters", stackName: "My-App", wantErr: true},
+		{name: "special characters", stackName: "my@app!", wantErr: true},
+		{name: "underscore", stackName: "my_app", wantErr: true},
+		{name: "ends with a hyphen", stackName: "my-app-", wantErr: true},
+		{name: "ends with an underscore", stackName: "my-app_", wantErr: true},
+		{name: "one character too long", stackName: strings.Repeat("a", maxHelmEdgeStackNameLength+1), wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := ValidateHelmEdgeStackName(tt.stackName)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+		})
+	}
 }

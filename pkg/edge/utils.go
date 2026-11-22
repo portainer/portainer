@@ -3,9 +3,12 @@ package edge
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
+
+	chartutil "helm.sh/helm/v4/pkg/chart/v2/util"
 )
 
 // GetPortainerURLFromEdgeKey returns the portainer URL from an edge key
@@ -67,4 +70,24 @@ func IsValidEdgeStackName(name string) bool {
 	}
 
 	return true
+}
+
+const (
+	helmReleaseNamePrefix = "edge-"
+	// Helm caps release names at 53 characters, and the "edge-" prefix takes 5 of them.
+	maxHelmEdgeStackNameLength = 48
+)
+
+// HelmReleaseName returns the Helm release name of a Helm edge stack.
+func HelmReleaseName(edgeStackName string) string {
+	return helmReleaseNamePrefix + edgeStackName
+}
+
+// ValidateHelmEdgeStackName returns an error when Helm would reject the stack's release name.
+func ValidateHelmEdgeStackName(name string) error {
+	if err := chartutil.ValidateReleaseName(HelmReleaseName(name)); err != nil {
+		return fmt.Errorf("a Helm stack name allows only lowercase letters, digits and '-' (not at either end), up to %d characters", maxHelmEdgeStackNameLength)
+	}
+
+	return nil
 }
