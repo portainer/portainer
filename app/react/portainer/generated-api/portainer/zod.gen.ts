@@ -7281,10 +7281,6 @@ export const zStackMigratePath = z.object({
   id: z.int(),
 });
 
-export const zStackMigrateQuery = z.object({
-  endpointId: z.int().optional(),
-});
-
 /**
  * Success
  */

@@ -32,7 +32,7 @@ export function routeMigrationRequest({
     return migrateSwarmStack({ id, fromEnvId, targetEnvId, name, fromSwarmId });
   }
 
-  return migrateStack({ id, fromEnvId, targetEnvId, name });
+  return migrateStack({ id, targetEnvId, name });
 }
 
 export async function migrateSwarmStack({
@@ -61,7 +61,6 @@ export async function migrateSwarmStack({
 
   return migrateStack({
     id,
-    fromEnvId,
     targetEnvId,
     name,
     targetSwarmId: targetSwarm.ID,
@@ -70,31 +69,21 @@ export async function migrateSwarmStack({
 
 export async function migrateStack({
   id,
-  fromEnvId,
   targetEnvId,
   name,
   targetSwarmId,
 }: {
   id: number;
-  fromEnvId: EnvironmentId;
   targetEnvId: EnvironmentId;
   name?: string;
   targetSwarmId?: string;
 }) {
   try {
-    return await axios.post(
-      buildStackUrl(id, 'migrate'),
-      {
-        EndpointID: targetEnvId,
-        Name: name,
-        SwarmID: targetSwarmId,
-      },
-      {
-        params: {
-          endpointId: fromEnvId,
-        },
-      }
-    );
+    return await axios.post(buildStackUrl(id, 'migrate'), {
+      EndpointID: targetEnvId,
+      Name: name,
+      SwarmID: targetSwarmId,
+    });
   } catch (err) {
     throw parseAxiosError(err);
   }

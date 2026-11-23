@@ -23123,12 +23123,7 @@ export type StackMigrateData = {
      */
     id: number;
   };
-  query?: {
-    /**
-     * Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack.
-     */
-    endpointId?: number;
-  };
+  query?: never;
   url: '/stacks/{id}/migrate';
 };
 

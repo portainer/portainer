@@ -43,7 +43,6 @@ func (payload *stackMigratePayload) Validate(r *http.Request) error {
 // @security jwt
 // @produce json
 // @param id path int true "Stack identifier"
-// @param endpointId query int false "Stacks created before version 1.18.0 might not have an associated environment(endpoint) identifier. Use this optional parameter to set the environment(endpoint) identifier used by the stack."
 // @param body body stackMigratePayload true "Stack migration details"
 // @success 200 {object} portainer.Stack "Success"
 // @failure 400 "Invalid request"
@@ -112,22 +111,24 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 	}
 
-	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-	// The EndpointID property is not available for these stacks, this API environment(endpoint)
-	// can use the optional EndpointID query parameter to associate a valid environment(endpoint) identifier to the stack.
-	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
-	if err != nil {
-		return httperror.BadRequest("Invalid query parameter: endpointId", err)
-	}
-	if endpointID != int(stack.EndpointID) {
-		stack.EndpointID = portainer.EndpointID(endpointID)
-	}
-
 	targetEndpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(payload.EndpointID))
 	if handler.DataStore.IsErrObjectNotFound(err) {
 		return httperror.NotFound("Unable to find an endpoint with the specified identifier inside the database", err)
 	} else if err != nil {
 		return httperror.InternalServerError("Unable to find an endpoint with the specified identifier inside the database", err)
+	}
+
+	if err := handler.requestBouncer.AuthorizedEndpointOperation(r, targetEndpoint); err != nil {
+		return httperror.Forbidden("Permission denied to access endpoint", err)
+	}
+
+	canManage, err = handler.userCanManageStacks(securityContext, targetEndpoint)
+	if err != nil {
+		return httperror.InternalServerError("Unable to verify user authorizations to validate stack migration", err)
+	}
+	if !canManage {
+		errMsg := "Stack migration is disabled for non-admin users"
+		return httperror.Forbidden(errMsg, errors.New(errMsg))
 	}
 
 	stack.EndpointID = portainer.EndpointID(payload.EndpointID)

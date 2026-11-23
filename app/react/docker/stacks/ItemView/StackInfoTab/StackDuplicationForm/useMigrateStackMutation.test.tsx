@@ -156,7 +156,7 @@ describe('Standalone stack migration', () => {
     expect(migrateRequestBody?.SwarmID).toBeUndefined();
   });
 
-  it('should pass id, fromEnvId, targetEnvId, name', async () => {
+  it('should pass id, targetEnvId, name', async () => {
     let migrateRequestBody: MigrateRequestBody | undefined;
     let migrateRequestParams: { endpointId: string | null } | undefined;
     let stackId: string | undefined;
@@ -184,7 +184,7 @@ describe('Standalone stack migration', () => {
     expect(stackId).toBe('7');
     expect(migrateRequestBody?.EndpointID).toBe(5);
     expect(migrateRequestBody?.Name).toBe('my-stack');
-    expect(migrateRequestParams?.endpointId).toBe('4');
+    expect(migrateRequestParams?.endpointId).toBeNull();
   });
 
   it('should not call getSwarm for standalone stacks', async () => {
@@ -256,7 +256,7 @@ describe('API request structure', () => {
     expect(requestBody?.Name).toBe('test-stack');
   });
 
-  it('should include endpointId in query params (fromEnvId)', async () => {
+  it('should not include endpointId in query params', async () => {
     let queryParams: URLSearchParams | undefined;
 
     server.use(
@@ -273,7 +273,7 @@ describe('API request structure', () => {
       targetEnvId: 3,
     });
 
-    expect(queryParams?.get('endpointId')).toBe('7');
+    expect(queryParams?.has('endpointId')).toBe(false);
   });
 });
 

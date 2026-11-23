@@ -1397,7 +1397,6 @@ import {
   zStackListResponse,
   zStackMigrateBody,
   zStackMigratePath,
-  zStackMigrateQuery,
   zStackMigrateResponse,
   zStackStartPath,
   zStackStartQuery,
@@ -9905,7 +9904,7 @@ export const stackMigrate = <ThrowOnError extends boolean = true>(
         .object({
           body: zStackMigrateBody,
           path: zStackMigratePath,
-          query: zStackMigrateQuery.optional(),
+          query: z.never().optional(),
         })
         .parseAsync(data),
     responseType: 'json',
