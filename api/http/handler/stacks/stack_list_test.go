@@ -90,6 +90,78 @@ func TestStackList_ExcludesStacksOnInaccessibleEnvironments(t *testing.T) {
 	assert.Equal(t, []portainer.StackID{accessibleStackID}, gotIDs)
 }
 
+func TestStackList_RedactsWebhookWhenUserCannotManageStacks(t *testing.T) {
+	t.Parallel()
+
+	const (
+		adminID    portainer.UserID     = 1
+		userID     portainer.UserID     = 2
+		endpointID portainer.EndpointID = 1
+		webhook                         = "05de31a2-79fa-4644-9c12-faa67e5c49f0"
+	)
+
+	for _, tc := range []struct {
+		name                 string
+		userID               portainer.UserID
+		allowStackManagement bool
+		expectedWebhook      string
+	}{
+		{name: "standard user without stack management", userID: userID, allowStackManagement: false, expectedWebhook: ""},
+		{name: "standard user with stack management", userID: userID, allowStackManagement: true, expectedWebhook: webhook},
+		{name: "admin without stack management", userID: adminID, allowStackManagement: false, expectedWebhook: webhook},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			_, store := datastore.MustNewTestStore(t, false, true)
+
+			require.NoError(t, store.User().Create(&portainer.User{Username: "admin", Role: portainer.AdministratorRole}))
+			require.NoError(t, store.User().Create(&portainer.User{Username: "standard", Role: portainer.StandardUserRole}))
+
+			group := &portainer.EndpointGroup{Name: "Unassigned"}
+			require.NoError(t, store.EndpointGroup().Create(group))
+
+			require.NoError(t, store.Endpoint().Create(&portainer.Endpoint{
+				ID:                 endpointID,
+				Name:               "docker",
+				Type:               portainer.DockerEnvironment,
+				GroupID:            group.ID,
+				UserAccessPolicies: portainer.UserAccessPolicies{userID: {}},
+				SecuritySettings: portainer.EndpointSecuritySettings{
+					AllowStackManagementForRegularUsers: tc.allowStackManagement,
+				},
+			}))
+
+			require.NoError(t, store.Stack().Create(&portainer.Stack{
+				ID:         1,
+				Name:       "webhooked",
+				EndpointID: endpointID,
+				Type:       portainer.DockerComposeStack,
+				AutoUpdate: &portainer.AutoUpdateSettings{Webhook: webhook},
+			}))
+
+			require.NoError(t, store.ResourceControl().Create(
+				authorization.NewPublicResourceControl(
+					stackutils.ResourceControlID(endpointID, "webhooked"),
+					portainer.StackResourceControl,
+				),
+			))
+
+			handler := NewHandler(testhelpers.NewTestRequestBouncer(), nil)
+			handler.DataStore = store
+
+			rr := serveAsUser(handler, tc.userID, "/stacks")
+			require.Equal(t, http.StatusOK, rr.Code, rr.Body.String())
+
+			var got []portainer.Stack
+			require.NoError(t, json.NewDecoder(rr.Body).Decode(&got))
+			require.Len(t, got, 1)
+			require.NotNil(t, got[0].AutoUpdate)
+			require.Equal(t, tc.expectedWebhook, got[0].AutoUpdate.Webhook)
+		})
+	}
+}
+
 func TestFilterStacks(t *testing.T) {
 	t.Parallel()
 	t.Run("filter stacks against particular endpoint and all orphaned stacks", func(t *testing.T) {

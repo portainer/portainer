@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"net/http"
+	"slices"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
@@ -43,21 +44,33 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return httperror.BadRequest("Invalid query parameter: filters", err)
 	}
 
-	endpoints, err := handler.DataStore.Endpoint().Endpoints()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve environments from database", err)
+	var endpoints []portainer.Endpoint
+	var stacks []portainer.Stack
+	var resourceControls []portainer.ResourceControl
+
+	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+		var err error
+		endpoints, err = tx.Endpoint().Endpoints()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve environments from database", err)
+		}
+
+		stacks, err = tx.Stack().ReadAll()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve stacks from the database", err)
+		}
+
+		resourceControls, err = tx.ResourceControl().ReadAll()
+		if err != nil {
+			return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
+		}
+
+		return nil
+	}); err != nil {
+		return response.TxErrorResponse(err)
 	}
 
-	stacks, err := handler.DataStore.Stack().ReadAll()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve stacks from the database", err)
-	}
 	stacks = filterStacks(stacks, &filters, endpoints)
-
-	resourceControls, err := handler.DataStore.ResourceControl().ReadAll()
-	if err != nil {
-		return httperror.InternalServerError("Unable to retrieve resource controls from the database", err)
-	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
@@ -71,8 +84,11 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 			return httperror.Forbidden("Permission denied to access orphaned stacks", httperrors.ErrUnauthorized)
 		}
 
-		user, err := handler.DataStore.User().Read(securityContext.UserID)
-		if err != nil {
+		var user *portainer.User
+		if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
+			user, err = tx.User().Read(securityContext.UserID)
+			return err
+		}); err != nil {
 			return httperror.InternalServerError("Unable to retrieve user information from the database", err)
 		}
 
@@ -85,6 +101,10 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		userTeamIDs := authorization.TeamIDs(securityContext.UserMemberships)
 
 		stacks = authorization.FilterAuthorizedStacks(stacks, user.ID, userTeamIDs, accessibleEndpointIDs)
+
+		if err := handler.redactWebhooks(securityContext, stacks, endpoints); err != nil {
+			return httperror.InternalServerError("Unable to verify user authorizations to manage stacks", err)
+		}
 	}
 
 	err = handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
@@ -98,6 +118,43 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	})
 
 	return response.TxResponse(w, stacks, err)
+}
+
+// redactWebhooks clears the webhook of the stacks the user can't manage,
+// as anyone holding the webhook can redeploy the stack
+func (handler *Handler) redactWebhooks(
+	securityContext *security.RestrictedRequestContext,
+	stacks []portainer.Stack,
+	endpoints []portainer.Endpoint,
+) error {
+	canManageByEndpoint := make(map[portainer.EndpointID]bool)
+
+	for i := range stacks {
+		stack := &stacks[i]
+		if stack.AutoUpdate == nil || stack.AutoUpdate.Webhook == "" {
+			continue
+		}
+
+		canManage, ok := canManageByEndpoint[stack.EndpointID]
+		if !ok {
+			// an orphaned stack has no environment and keeps canManage false
+			endpointIdx := slices.IndexFunc(endpoints, func(e portainer.Endpoint) bool { return e.ID == stack.EndpointID })
+			if endpointIdx >= 0 {
+				var err error
+				if canManage, err = handler.userCanManageStacks(securityContext, &endpoints[endpointIdx]); err != nil {
+					return err
+				}
+			}
+
+			canManageByEndpoint[stack.EndpointID] = canManage
+		}
+
+		if !canManage {
+			stack.AutoUpdate.Webhook = ""
+		}
+	}
+
+	return nil
 }
 
 // filterStacks refines a collection of Stack instances using specified criteria.
