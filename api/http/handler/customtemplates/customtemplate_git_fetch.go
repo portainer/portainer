@@ -4,12 +4,14 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/dataservices/source"
 	gittypes "github.com/portainer/portainer/api/git/types"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/stacks/stackutils"
 	httperror "github.com/portainer/portainer/pkg/libhttp/error"
@@ -30,6 +32,7 @@ import (
 // @param id path int true "Template identifier"
 // @success 200 {object} fileResponse "Success"
 // @failure 400 "Invalid request"
+// @failure 403 "Access denied to resource"
 // @failure 404 "Custom template not found"
 // @failure 500 "Server error"
 // @router /custom_templates/{id}/git_fetch [put]
@@ -59,7 +62,20 @@ func (handler *Handler) customTemplateGitFetch(w http.ResponseWriter, r *http.Re
 
 	var src *portainer.Source
 	if err := handler.DataStore.ViewTx(func(tx dataservices.DataStoreTx) error {
-		var err error
+		if !securityContext.IsAdmin {
+			resourceControl, err := tx.ResourceControl().ResourceControlByResourceIDAndType(
+				strconv.Itoa(customTemplateID),
+				portainer.CustomTemplateResourceControl,
+			)
+			if err != nil {
+				return httperror.InternalServerError("Unable to retrieve a resource control associated to the custom template", err)
+			}
+
+			customTemplate.ResourceControl = resourceControl
+			if !userCanReadTemplate(customTemplate, securityContext) {
+				return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
+			}
+		}
 
 		userContext := source.NewUserContext(securityContext.User, securityContext.UserMemberships)
 		src, err = tx.Source().Read(userContext, file.SourceID)

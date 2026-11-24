@@ -12,7 +12,6 @@ import (
 	gittypes "github.com/portainer/portainer/api/git/types"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/testhelpers"
-	httperror "github.com/portainer/portainer/pkg/libhttp/error"
 
 	"github.com/gorilla/mux"
 	"github.com/segmentio/encoding/json"
@@ -52,112 +51,210 @@ func newTestHandler(t *testing.T) (*Handler, dataservices.DataStore, portainer.F
 	return handler, ds, fs
 }
 
-func TestInspectHandler(t *testing.T) {
+func TestInspectHandler_NotFound(t *testing.T) {
 	t.Parallel()
 
-	handler, ds, _ := newTestHandler(t)
+	handler, _, _ := newTestHandler(t)
 
-	require.NoError(t, ds.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		require.NoError(t, tx.CustomTemplate().Create(&portainer.CustomTemplate{ID: 1}))
-		require.NoError(t, tx.CustomTemplate().Create(&portainer.CustomTemplate{ID: 2}))
-		require.NoError(t, tx.ResourceControl().Create(&portainer.ResourceControl{
-			ID: 1, ResourceID: "2", Type: portainer.CustomTemplateResourceControl,
-			UserAccesses: []portainer.UserResourceAccess{{UserID: 2}},
-			TeamAccesses: []portainer.TeamResourceAccess{{TeamID: 1}},
-		}))
-		return nil
-	}))
-
-	test := func(templateID string, restrictedContext *security.RestrictedRequestContext) (*httptest.ResponseRecorder, *httperror.HandlerError) {
-		r := httptest.NewRequest(http.MethodGet, "/custom_templates/"+templateID, nil)
-		r = mux.SetURLVars(r, map[string]string{"id": templateID})
-		ctx := security.StoreRestrictedRequestContext(r, restrictedContext)
-		r = r.WithContext(ctx)
-		rr := httptest.NewRecorder()
-		return rr, handler.customTemplateInspect(rr, r)
-	}
-
-	t.Run("unknown id should get not found error", func(t *testing.T) {
-		_, r := test("0", &security.RestrictedRequestContext{UserID: 1, User: &portainer.User{ID: 1, Role: portainer.AdministratorRole}})
-		require.NotNil(t, r)
-		require.Equal(t, http.StatusNotFound, r.StatusCode)
-	})
-
-	t.Run("admin should access adminonly template", func(t *testing.T) {
-		rr, r := test("1", &security.RestrictedRequestContext{UserID: 1, IsAdmin: true, User: &portainer.User{ID: 1, Role: portainer.AdministratorRole}})
-		require.Nil(t, r)
-		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
-
-		var template portainer.CustomTemplate
-		require.NoError(t, json.NewDecoder(rr.Body).Decode(&template))
-		require.Equal(t, portainer.CustomTemplateID(1), template.ID)
-	})
-
-	t.Run("std should not access adminonly template", func(t *testing.T) {
-		_, r := test("1", &security.RestrictedRequestContext{UserID: 2, User: &portainer.User{ID: 2, Role: portainer.StandardUserRole}})
-		require.NotNil(t, r)
-		require.Equal(t, http.StatusForbidden, r.StatusCode)
-	})
-
-	t.Run("std should access template via direct user access", func(t *testing.T) {
-		rr, r := test("2", &security.RestrictedRequestContext{UserID: 2, User: &portainer.User{ID: 2, Role: portainer.StandardUserRole}})
-		require.Nil(t, r)
-		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
-
-		var template portainer.CustomTemplate
-		require.NoError(t, json.NewDecoder(rr.Body).Decode(&template))
-		require.Equal(t, portainer.CustomTemplateID(2), template.ID)
-	})
-
-	t.Run("std should access template via team access", func(t *testing.T) {
-		rr, r := test("2", &security.RestrictedRequestContext{UserID: 3, User: &portainer.User{ID: 3, Role: portainer.StandardUserRole}, UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}}})
-		require.Nil(t, r)
-		require.Equal(t, http.StatusOK, rr.Result().StatusCode)
-
-		var template portainer.CustomTemplate
-		require.NoError(t, json.NewDecoder(rr.Body).Decode(&template))
-		require.Equal(t, portainer.CustomTemplateID(2), template.ID)
-	})
-
-	t.Run("std should not access template without access", func(t *testing.T) {
-		_, r := test("2", &security.RestrictedRequestContext{UserID: 4, User: &portainer.User{ID: 4, Role: portainer.StandardUserRole}})
-		require.NotNil(t, r)
-		require.Equal(t, http.StatusForbidden, r.StatusCode)
-	})
-}
-
-func TestInspectHandler_CreatorDeniedWhenAdminOnly(t *testing.T) {
-	t.Parallel()
-
-	handler, store, _ := newTestHandler(t)
-
-	err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
-		err := tx.CustomTemplate().Create(&portainer.CustomTemplate{
-			ID:              5,
-			CreatedByUserID: 2,
-		})
-		require.NoError(t, err)
-
-		err = tx.ResourceControl().Create(&portainer.ResourceControl{
-			ID:                 5,
-			ResourceID:         "5",
-			Type:               portainer.CustomTemplateResourceControl,
-			AdministratorsOnly: true,
-		})
-		require.NoError(t, err)
-
-		return nil
-	})
-	require.NoError(t, err)
-
-	r := httptest.NewRequest(http.MethodGet, "/custom_templates/5", nil)
-	r = mux.SetURLVars(r, map[string]string{"id": "5"})
-	r = r.WithContext(security.StoreRestrictedRequestContext(r, &security.RestrictedRequestContext{UserID: 2, User: &portainer.User{ID: 2, Role: portainer.StandardUserRole}}))
+	r := httptest.NewRequest(http.MethodGet, "/custom_templates/99", nil)
+	r = mux.SetURLVars(r, map[string]string{"id": "99"})
+	r = r.WithContext(security.StoreRestrictedRequestContext(
+		r,
+		&security.RestrictedRequestContext{
+			UserID:  1,
+			IsAdmin: true,
+			User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+		},
+	))
 	rr := httptest.NewRecorder()
 
 	herr := handler.customTemplateInspect(rr, r)
 	require.NotNil(t, herr)
-	require.Equal(t, http.StatusForbidden, herr.StatusCode)
+	require.Equal(t, http.StatusNotFound, herr.StatusCode)
+}
+
+func TestInspectHandler_AccessControl(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		createdByUserID portainer.UserID
+		resourceControl *portainer.ResourceControl
+		context         *security.RestrictedRequestContext
+		expectedStatus  int
+	}{
+		{
+			name:            "non-creator is forbidden without resource control",
+			createdByUserID: 1,
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator is forbidden without resource control",
+			createdByUserID: 2,
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator is forbidden when an admin restricted the template to administrators",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{AdministratorsOnly: true},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator is forbidden when the resource control only grants access to another user",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{
+				UserAccesses: []portainer.UserResourceAccess{{UserID: 3}},
+			},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "non-creator is forbidden when the resource control only grants access to the creator",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{
+				UserAccesses: []portainer.UserResourceAccess{{UserID: 2}},
+			},
+			context: &security.RestrictedRequestContext{
+				UserID: 3,
+				User:   &portainer.User{ID: 3, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator with access can access template",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{UserAccesses: []portainer.UserResourceAccess{{UserID: 2}}},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "non-creator with access can access template",
+			createdByUserID: 3,
+			resourceControl: &portainer.ResourceControl{UserAccesses: []portainer.UserResourceAccess{{UserID: 2}}},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "creator can access template via team access",
+			createdByUserID: 3,
+			resourceControl: &portainer.ResourceControl{TeamAccesses: []portainer.TeamResourceAccess{{TeamID: 1}}},
+			context: &security.RestrictedRequestContext{
+				UserID:          3,
+				User:            &portainer.User{ID: 3, Role: portainer.StandardUserRole},
+				UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "non-creator can access template via team access",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{TeamAccesses: []portainer.TeamResourceAccess{{TeamID: 1}}},
+			context: &security.RestrictedRequestContext{
+				UserID:          3,
+				User:            &portainer.User{ID: 3, Role: portainer.StandardUserRole},
+				UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "admin can access template without resource control",
+			createdByUserID: 2,
+			context: &security.RestrictedRequestContext{
+				UserID:  1,
+				IsAdmin: true,
+				User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "admin can access template restricted to administrators",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{AdministratorsOnly: true},
+			context: &security.RestrictedRequestContext{
+				UserID:  1,
+				IsAdmin: true,
+				User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "any user can access public template",
+			createdByUserID: 1,
+			resourceControl: &portainer.ResourceControl{Public: true},
+			context: &security.RestrictedRequestContext{
+				UserID: 4,
+				User:   &portainer.User{ID: 4, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler, store, _ := newTestHandler(t)
+
+			err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+				err := tx.CustomTemplate().Create(&portainer.CustomTemplate{
+					ID:              1,
+					CreatedByUserID: tc.createdByUserID,
+				})
+				require.NoError(t, err)
+
+				if tc.resourceControl == nil {
+					return nil
+				}
+
+				tc.resourceControl.ID = 1
+				tc.resourceControl.ResourceID = "1"
+				tc.resourceControl.Type = portainer.CustomTemplateResourceControl
+
+				return tx.ResourceControl().Create(tc.resourceControl)
+			})
+			require.NoError(t, err)
+
+			r := httptest.NewRequest(http.MethodGet, "/custom_templates/1", nil)
+			r = mux.SetURLVars(r, map[string]string{"id": "1"})
+			r = r.WithContext(security.StoreRestrictedRequestContext(r, tc.context))
+			rr := httptest.NewRecorder()
+
+			herr := handler.customTemplateInspect(rr, r)
+
+			if tc.expectedStatus == http.StatusOK {
+				require.Nil(t, herr)
+				require.Equal(t, http.StatusOK, rr.Code)
+
+				var template portainer.CustomTemplate
+				require.NoError(t, json.NewDecoder(rr.Body).Decode(&template))
+				require.Equal(t, portainer.CustomTemplateID(1), template.ID)
+			} else {
+				require.NotNil(t, herr)
+				require.Equal(t, tc.expectedStatus, herr.StatusCode)
+			}
+		})
+	}
 }
 
 func TestInspectHandler_GitConfigPopulatedFromSource(t *testing.T) {

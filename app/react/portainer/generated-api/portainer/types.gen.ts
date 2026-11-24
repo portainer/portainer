@@ -13684,6 +13684,10 @@ export type CustomTemplateGitFetchErrors = {
    */
   400: unknown;
   /**
+   * Access denied to resource
+   */
+  403: unknown;
+  /**
    * Custom template not found
    */
   404: unknown;

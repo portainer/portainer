@@ -50,12 +50,12 @@ func NewHandler(bouncer security.BouncerService, dataStore dataservices.DataStor
 	return h
 }
 
-func userCanEditTemplate(customTemplate *portainer.CustomTemplate, securityContext *security.RestrictedRequestContext) bool {
-	resourceControl := customTemplate.ResourceControl
-
-	if securityContext.IsAdmin {
+func userCanEditTemplate(customTemplate *portainer.CustomTemplate, sc *security.RestrictedRequestContext) bool {
+	if sc.IsAdmin {
 		return true
 	}
+
+	resourceControl := customTemplate.ResourceControl
 
 	if resourceControl == nil || resourceControl.AdministratorsOnly {
 		return false
@@ -65,13 +65,40 @@ func userCanEditTemplate(customTemplate *portainer.CustomTemplate, securityConte
 		return true
 	}
 
-	if customTemplate.CreatedByUserID != securityContext.UserID {
+	if customTemplate.CreatedByUserID != sc.UserID {
 		return false
 	}
 
-	teamIDs := slicesx.Map(securityContext.UserMemberships, func(m portainer.TeamMembership) portainer.TeamID {
-		return m.TeamID
-	})
+	teamIDs := authorization.TeamIDs(sc.UserMemberships)
 
-	return authorization.UserCanAccessResource(securityContext.UserID, teamIDs, resourceControl)
+	return authorization.UserCanAccessResource(sc.UserID, teamIDs, resourceControl)
+}
+
+func userCanReadTemplate(customTemplate *portainer.CustomTemplate, sc *security.RestrictedRequestContext) bool {
+	if sc.IsAdmin {
+		return true
+	}
+
+	resourceControl := customTemplate.ResourceControl
+
+	if resourceControl == nil || resourceControl.AdministratorsOnly {
+		return false
+	}
+
+	if resourceControl.Public {
+		return true
+	}
+
+	teamIDs := authorization.TeamIDs(sc.UserMemberships)
+
+	return authorization.UserCanAccessResource(sc.UserID, teamIDs, resourceControl)
+}
+
+func filterAuthorizedCustomTemplates(
+	customTemplates []portainer.CustomTemplate,
+	sc *security.RestrictedRequestContext,
+) []portainer.CustomTemplate {
+	return slicesx.Filter(customTemplates, func(customTemplate portainer.CustomTemplate) bool {
+		return userCanReadTemplate(&customTemplate, sc)
+	})
 }

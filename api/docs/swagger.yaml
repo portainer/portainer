@@ -15245,6 +15245,8 @@ paths:
             $ref: '#/definitions/customtemplates.fileResponse'
         "400":
           description: Invalid request
+        "403":
+          description: Access denied to resource
         "404":
           description: Custom template not found
         "500":

@@ -60,14 +60,7 @@ func (handler *Handler) customTemplateList(w http.ResponseWriter, r *http.Reques
 		customTemplates = authorization.DecorateCustomTemplates(customTemplates, resourceControls)
 
 		if !securityContext.IsAdmin {
-			user, err := tx.User().Read(securityContext.UserID)
-			if err != nil {
-				return httperror.InternalServerError("Unable to retrieve user information from the database", err)
-			}
-
-			userTeamIDs := authorization.TeamIDs(securityContext.UserMemberships)
-
-			customTemplates = authorization.FilterAuthorizedCustomTemplates(customTemplates, user, userTeamIDs)
+			customTemplates = filterAuthorizedCustomTemplates(customTemplates, securityContext)
 		}
 
 		customTemplates = filterByType(customTemplates, templateTypes)

@@ -73,16 +73,3 @@ func FilterAuthorizedStacks(
 
 	return authorizedStacks
 }
-
-// FilterAuthorizedCustomTemplates returns a list of decorated custom templates filtered through resource control access checks.
-func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate, user *portainer.User, userTeamIDs []portainer.TeamID) []portainer.CustomTemplate {
-	authorizedTemplates := make([]portainer.CustomTemplate, 0)
-
-	for _, customTemplate := range customTemplates {
-		if customTemplate.CreatedByUserID == user.ID || (customTemplate.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, customTemplate.ResourceControl)) {
-			authorizedTemplates = append(authorizedTemplates, customTemplate)
-		}
-	}
-
-	return authorizedTemplates
-}

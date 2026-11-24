@@ -12,7 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/dataservices"
 	"github.com/portainer/portainer/api/datastore"
 	"github.com/portainer/portainer/api/filesystem"
 	gittypes "github.com/portainer/portainer/api/git/types"
@@ -197,6 +199,37 @@ func Test_customTemplateGitFetch(t *testing.T) {
 	err = store.CustomTemplateService.Create(template1)
 	require.NoError(t, err, "error creating custom template 1")
 
+	require.NoError(
+		t,
+		store.ResourceControl().Create(&portainer.ResourceControl{
+			ResourceID: "1",
+			Type:       portainer.CustomTemplateResourceControl,
+			Public:     true,
+		}),
+		"error creating resource control for custom template 1",
+	)
+
+	// template 2 is private to user 1 but shares the public source
+	require.NoError(
+		t,
+		store.CustomTemplateService.Create(&portainer.CustomTemplate{
+			ID:              2,
+			Title:           "custom-template-2",
+			CreatedByUserID: user1.ID,
+			Artifact:        &portainer.Artifact{Files: []portainer.ArtifactFile{{Path: configFilePath, SourceID: src.ID}}},
+		}),
+		"error creating custom template 2",
+	)
+	require.NoError(
+		t,
+		store.ResourceControl().Create(&portainer.ResourceControl{
+			ResourceID:   "2",
+			Type:         portainer.CustomTemplateResourceControl,
+			UserAccesses: []portainer.UserResourceAccess{{UserID: user1.ID, AccessLevel: portainer.ReadWriteAccessLevel}},
+		}),
+		"error creating resource control for custom template 2",
+	)
+
 	// prepare testing folder
 	err = prepareTestFolder(template1.ProjectPath, configFilePath)
 	require.NoError(t, err, "error creating testing folder")
@@ -271,6 +304,16 @@ func Test_customTemplateGitFetch(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	t.Run("denies a user without access to the custom template even with source access", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPut, "/custom_templates/2/git_fetch", bytes.NewBufferString("{}"))
+		testhelpers.AddTestSecurityCookie(req, jwt2)
+
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, req)
+
+		require.Equal(t, http.StatusForbidden, rr.Code)
+	})
+
 	t.Run("restore git repository if it is failed to download the new git repository", func(t *testing.T) {
 		invalidGitService := &InvalidTestGitService{
 			targetFilePath: filesystem.JoinPaths(template1.ProjectPath, configFilePath),
@@ -336,4 +379,205 @@ func TestCustomTemplateGitFetch_EmptySourceIDsReturnsBadRequest(t *testing.T) {
 	h.ServeHTTP(rr, req)
 
 	require.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+func TestCustomTemplateGitFetch_AccessControl(t *testing.T) {
+	t.Parallel()
+
+	const configFilePath = "docker-compose.yml"
+
+	tests := []struct {
+		name            string
+		createdByUserID portainer.UserID
+		resourceControl *portainer.ResourceControl
+		context         *security.RestrictedRequestContext
+		expectedStatus  int
+	}{
+		{
+			name:            "non-creator is forbidden without resource control",
+			createdByUserID: 1,
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator is forbidden without resource control",
+			createdByUserID: 2,
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator is forbidden when an admin restricted the template to administrators",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{AdministratorsOnly: true},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator is forbidden when the resource control only grants access to another user",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{
+				UserAccesses: []portainer.UserResourceAccess{{UserID: 3}},
+			},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "non-creator is forbidden when the resource control only grants access to the creator",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{
+				UserAccesses: []portainer.UserResourceAccess{{UserID: 2}},
+			},
+			context: &security.RestrictedRequestContext{
+				UserID: 3,
+				User:   &portainer.User{ID: 3, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusForbidden,
+		},
+		{
+			name:            "creator with access can access template",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{UserAccesses: []portainer.UserResourceAccess{{UserID: 2}}},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "non-creator with access can access template",
+			createdByUserID: 3,
+			resourceControl: &portainer.ResourceControl{UserAccesses: []portainer.UserResourceAccess{{UserID: 2}}},
+			context: &security.RestrictedRequestContext{
+				UserID: 2,
+				User:   &portainer.User{ID: 2, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "creator can access template via team access",
+			createdByUserID: 3,
+			resourceControl: &portainer.ResourceControl{TeamAccesses: []portainer.TeamResourceAccess{{TeamID: 1}}},
+			context: &security.RestrictedRequestContext{
+				UserID:          3,
+				User:            &portainer.User{ID: 3, Role: portainer.StandardUserRole},
+				UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "non-creator can access template via team access",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{TeamAccesses: []portainer.TeamResourceAccess{{TeamID: 1}}},
+			context: &security.RestrictedRequestContext{
+				UserID:          3,
+				User:            &portainer.User{ID: 3, Role: portainer.StandardUserRole},
+				UserMemberships: []portainer.TeamMembership{{ID: 1, UserID: 3, TeamID: 1}},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "admin can access template without resource control",
+			createdByUserID: 2,
+			context: &security.RestrictedRequestContext{
+				UserID:  1,
+				IsAdmin: true,
+				User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "admin can access template restricted to administrators",
+			createdByUserID: 2,
+			resourceControl: &portainer.ResourceControl{AdministratorsOnly: true},
+			context: &security.RestrictedRequestContext{
+				UserID:  1,
+				IsAdmin: true,
+				User:    &portainer.User{ID: 1, Role: portainer.AdministratorRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:            "any user can access public template",
+			createdByUserID: 1,
+			resourceControl: &portainer.ResourceControl{Public: true},
+			context: &security.RestrictedRequestContext{
+				UserID: 4,
+				User:   &portainer.User{ID: 4, Role: portainer.StandardUserRole},
+			},
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			handler, store, fs := newTestHandler(t)
+
+			err := store.UpdateTx(func(tx dataservices.DataStoreTx) error {
+				src := &portainer.Source{
+					Type:   portainer.SourceTypeGit,
+					Public: true,
+					Git:    &gittypes.GitSource{URL: "https://github.com/example/repo"},
+				}
+				err := tx.Source().Create(adminUserContext, src)
+				require.NoError(t, err)
+
+				path, err := fs.StoreCustomTemplateFileFromBytes("1", configFilePath, []byte("stale content"))
+				require.NoError(t, err)
+
+				handler.GitService = &TestGitService{targetFilePath: filesystem.JoinPaths(path, configFilePath)}
+
+				err = tx.CustomTemplate().Create(&portainer.CustomTemplate{
+					ID:              1,
+					ProjectPath:     path,
+					CreatedByUserID: tc.createdByUserID,
+					Artifact:        &portainer.Artifact{Files: []portainer.ArtifactFile{{Path: configFilePath, SourceID: src.ID}}},
+				})
+				require.NoError(t, err)
+
+				if tc.resourceControl == nil {
+					return nil
+				}
+
+				tc.resourceControl.ID = 1
+				tc.resourceControl.ResourceID = "1"
+				tc.resourceControl.Type = portainer.CustomTemplateResourceControl
+
+				return tx.ResourceControl().Create(tc.resourceControl)
+			})
+			require.NoError(t, err)
+
+			r := httptest.NewRequest(http.MethodPut, "/custom_templates/1/git_fetch", nil)
+			r = mux.SetURLVars(r, map[string]string{"id": "1"})
+			r = r.WithContext(security.StoreRestrictedRequestContext(r, tc.context))
+			rr := httptest.NewRecorder()
+
+			herr := handler.customTemplateGitFetch(rr, r)
+
+			if tc.expectedStatus == http.StatusOK {
+				require.Nil(t, herr)
+				require.Equal(t, http.StatusOK, rr.Code)
+
+				var res struct{ FileContent string }
+				require.NoError(t, json.NewDecoder(rr.Body).Decode(&res))
+				require.Equal(t, testFileContent, res.FileContent)
+			} else {
+				require.NotNil(t, herr)
+				require.Equal(t, tc.expectedStatus, herr.StatusCode)
+			}
+		})
+	}
 }

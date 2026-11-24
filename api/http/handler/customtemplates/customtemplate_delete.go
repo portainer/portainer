@@ -52,8 +52,7 @@ func (handler *Handler) customTemplateDelete(w http.ResponseWriter, r *http.Requ
 	}
 
 	customTemplate.ResourceControl = resourceControl
-	access := userCanEditTemplate(customTemplate, securityContext)
-	if !access {
+	if !userCanEditTemplate(customTemplate, securityContext) {
 		return httperror.Forbidden("Access denied to resource", httperrors.ErrResourceAccessDenied)
 	}
 
@@ -75,5 +74,4 @@ func (handler *Handler) customTemplateDelete(w http.ResponseWriter, r *http.Requ
 	}
 
 	return response.Empty(w)
-
 }

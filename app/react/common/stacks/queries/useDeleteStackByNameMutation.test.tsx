@@ -125,10 +125,7 @@ test('cancels the in-flight request for a deleted stack instead of letting a sta
       // Hold the request open past the delete, reproducing the slow-GET
       // outlives-fast-DELETE race described in the ticket.
       await staleDetailGet;
-      return HttpResponse.json(
-        { message: 'Stack not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ message: 'Stack not found' }, { status: 404 });
     }),
     http.get('/api/stacks', () => HttpResponse.json([])),
     http.delete(`/api/stacks/name/${STACK_NAME}`, () => {
