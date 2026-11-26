@@ -29,12 +29,19 @@ function Cell({
   }
 
   const mode = getValue();
+  const isJob = mode === 'replicated-job' || mode === 'global-job';
+
   return (
     <div className="flex items-center gap-3">
       {mode}
-      <code>{totalRunningTasks(item.Tasks)}</code> /{' '}
       <code>
-        {mode === 'replicated'
+        {isJob
+          ? totalCompletedTasks(item.Tasks)
+          : totalRunningTasks(item.Tasks)}
+      </code>{' '}
+      /{' '}
+      <code>
+        {mode === 'replicated' || mode === 'replicated-job'
           ? item.Replicas
           : availableNodeCount(nodesQuery.data, item)}
       </code>
@@ -48,6 +55,10 @@ function totalRunningTasks(tasks: Array<TaskViewModel>) {
     (task) =>
       task.Status?.State === 'running' && task.DesiredState === 'running'
   ).length;
+}
+
+function totalCompletedTasks(tasks: Array<TaskViewModel>) {
+  return tasks.filter((task) => task.Status?.State === 'complete').length;
 }
 
 function availableNodeCount(nodes: Array<Node>, service: ServiceViewModel) {
