@@ -34,6 +34,7 @@ interface Props extends AutomationTestingProps {
   fileName?: string;
   placeholder?: string;
   showToolbar?: boolean;
+  onSave?: () => void;
 }
 
 export const theme = createTheme({
@@ -82,10 +83,11 @@ export function CodeEditor({
   placeholder,
   showToolbar = true,
   'aria-label': ariaLabel,
+  onSave,
 }: Props & Pick<AriaAttributes, 'aria-label'>) {
   const [isRollback, setIsRollback] = useState(false);
 
-  const extensions = useCodeEditorExtensions(type, schema);
+  const extensions = useCodeEditorExtensions(type, schema, onSave);
 
   const handleVersionChange = useCallback(
     (version: number) => {

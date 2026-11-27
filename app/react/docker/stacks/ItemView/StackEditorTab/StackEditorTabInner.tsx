@@ -52,8 +52,14 @@ export function StackEditorTabInner({
     'PortainerStackUpdate'
   );
 
-  const { values, errors, setFieldValue, isValid, initialValues } =
-    useFormikContext<StackEditorFormValues>();
+  const {
+    values,
+    errors,
+    setFieldValue,
+    isValid,
+    initialValues,
+    submitForm,
+  } = useFormikContext<StackEditorFormValues>();
 
   usePreventExit(
     initialValues.stackFileContent,
@@ -75,6 +81,13 @@ export function StackEditorTabInner({
   });
 
   const isDeployDisabled = isOrphaned;
+
+  const onSave = useCallback(() => {
+    if (!isValid || isDeployDisabled) {
+      return;
+    }
+    submitForm();
+  }, [isValid, isDeployDisabled]);
 
   return (
     <Form className="form-horizontal">
@@ -125,6 +138,7 @@ export function StackEditorTabInner({
             data-cy="stack-editor"
             onVersionChange={handleVersionChange}
             versions={versions}
+            onSave={onSave}
           />
         </div>
       </div>
