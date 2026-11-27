@@ -37,6 +37,9 @@ LABEL git_commit=$GIT_COMMIT \
   org.opencontainers.image.url="https://www.portainer.io" \
   org.opencontainers.image.documentation="https://docs.portainer.io" \
   io.portainer.server="true"
+  
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD ["/portainer", "--healthcheck"]
 
 ENTRYPOINT ["/portainer"]
 
