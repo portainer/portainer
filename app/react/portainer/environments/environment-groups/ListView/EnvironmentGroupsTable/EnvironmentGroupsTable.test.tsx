@@ -572,6 +572,38 @@ describe('EnvironmentGroupsTable', () => {
     });
   });
 
+  describe('Group size', () => {
+    it('should show the platform of a group that has environments', async () => {
+      server.use(
+        http.get('/api/endpoint_groups', ({ request }) => {
+          const withSize =
+            new URL(request.url).searchParams.get('size') === 'true';
+          return HttpResponse.json([
+            buildGroup({
+              Id: 2,
+              Name: 'Docker Hosts',
+              ...(withSize && {
+                Total: 2,
+                TypeInfo: { Docker: 2, Kubernetes: 0, Podman: 0, Mixed: false },
+              }),
+            }),
+          ]);
+        })
+      );
+
+      const Wrapped = withTestQueryProvider(
+        withTestRouter(withUserProvider(EnvironmentGroupsTable))
+      );
+      render(<Wrapped />);
+
+      await waitForLoaded();
+
+      expect(
+        screen.getByTestId('environment-group-platform_Docker Hosts')
+      ).toHaveTextContent(/^Docker$/);
+    });
+  });
+
   describe('Group Row Features', () => {
     it('should display ungoverned group', async () => {
       server.use(

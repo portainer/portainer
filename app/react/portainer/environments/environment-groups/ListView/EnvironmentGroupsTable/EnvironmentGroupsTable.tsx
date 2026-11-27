@@ -18,7 +18,7 @@ import { EnvironmentGroupRow } from './EnvironmentGroupRow';
 const SORT_OPTIONS: SortOption[] = [{ key: 'Name', label: 'Name' }];
 
 export function EnvironmentGroupsTable() {
-  const groupsQuery = useGroups();
+  const groupsQuery = useGroups({ size: true });
   const tagsQuery = useTags();
   const tableState = useSortableListState('environment_groups', 'Name');
 
