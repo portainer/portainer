@@ -41,6 +41,13 @@ func NewClientWithRegistry(registryClient RegistryAuthProvider, clientFactory Cl
 	}
 }
 
+// WithSystemContext sets the registry connection options, such as TLS verification, used for every lookup
+func (c *DigestClient) WithSystemContext(sysCtx *imagetypes.SystemContext) *DigestClient {
+	c.sysCtx = sysCtx
+
+	return c
+}
+
 func (c *DigestClient) RemoteDigest(ctx context.Context, image Image) (digest.Digest, error) {
 	ctx, cancel := context.WithTimeout(ctx, digestFetchTimeout)
 	defer cancel()
@@ -63,12 +70,16 @@ func (c *DigestClient) RemoteDigest(ctx context.Context, image Image) (digest.Di
 		if err != nil {
 			log.Info().Str("image up to date indicator", image.String()).Msg("No environment registry credentials found, using anonymous access")
 		} else {
-			sysCtx = &imagetypes.SystemContext{
-				DockerAuthConfig: &imagetypes.DockerAuthConfig{
-					Username: username,
-					Password: password,
-				},
+			authCtx := imagetypes.SystemContext{}
+			if c.sysCtx != nil {
+				authCtx = *c.sysCtx
 			}
+
+			authCtx.DockerAuthConfig = &imagetypes.DockerAuthConfig{
+				Username: username,
+				Password: password,
+			}
+			sysCtx = &authCtx
 		}
 	}
 
