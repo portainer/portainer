@@ -16,11 +16,22 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/protocol/packp/capability"
+	"github.com/go-git/go-git/v5/plumbing/transport"
 	gogitfs "github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
+
+func init() {
+	// Azure DevOps (Server and Services) requires multi_ack/multi_ack_detailed and
+	// rejects the upload-pack request with HTTP 400 when go-git withholds them.
+	// go-git only lacks support for them on incremental fetches; every clone here
+	// starts from an empty repository, so allowing them is safe.
+	// ref: https://github.com/go-git/go-git/blob/main/_examples/azure_devops/main.go
+	transport.UnsupportedCapabilities = []capability.Capability{capability.ThinPack}
+}
 
 // noSymlinkFS wraps a billy.Filesystem and rejects symlink creation to prevent
 // symlink traversal attacks from untrusted git repositories
